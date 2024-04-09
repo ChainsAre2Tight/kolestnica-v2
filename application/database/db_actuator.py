@@ -64,6 +64,20 @@ def prepare_test_environment() -> None:
             users=[test_user_1, test_user_2]
         )
 
+        msg_1 = m.Message(
+            body='hello world!',
+            timestamp='1000000',
+            author=test_user_1,
+            chat=test_chat_1
+        )
+
+        msg_2 = m.Message(
+            body='go away loser',
+            timestamp='10000000',
+            author=test_user_2,
+            chat=test_chat_1
+        )
+
         db.session.add(test_user_1)
         db.session.add(test_user_1_login)
         db.session.add(test_user_1_session)
@@ -74,6 +88,8 @@ def prepare_test_environment() -> None:
         db.session.add(test_user_3_login)
         db.session.add(test_user_3_session)
         db.session.add(test_chat_1)
+        db.session.add(msg_1)
+        db.session.add(msg_2)
 
         db.session.commit()
 
