@@ -20,6 +20,11 @@ def convert_model_to_dataclass(objects: list, target_dataclass: ModelDataclassIn
 
     return [target_dataclass.from_model(obj) for obj in objects]
 
+def convert_dataclass_to_dict(objects: list[ModelDataclassInterface]) -> list[dict]:
+    """Converts a list of dataclass objects to dictionary objects"""
+
+    return [obj.__dict__ for obj in objects]
+
 @dataclass
 class Chat(ModelDataclassInterface):
     id: int
