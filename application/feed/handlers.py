@@ -1,5 +1,4 @@
 from flask import jsonify, request, make_response, Response
-import json
 from utils.wrappers import require_access_token, handle_user_existance
 import utils.my_dataclasses as dataclass
 import sqlalchemy.exc as sql
@@ -39,3 +38,17 @@ def get_users(token: dataclass.Token) -> tuple[Response, int]:
     ]
 
     return jsonify(users), 200
+
+@app.route('/api/data/chats/<int:id>/messages', methods=['GET'])
+@require_access_token
+@handle_user_existance
+def get_messages_by_chat(token: dataclass.Token, id: int) -> tuple[Response, int]:
+    """This endpoint provides a way to get all mesages within a specified chat if a user has access to it"""
+
+    messages = [
+        user.__dict__
+        for user in
+        q.get_messages_by_chat_id(chat_id=id, sessionId=token.sessionId)
+    ]
+
+    return jsonify(messages), 200

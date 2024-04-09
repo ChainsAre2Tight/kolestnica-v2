@@ -53,3 +53,21 @@ class OtherUser(ModelDataclassInterface):
             alias=model_object.alias,
             image_href=model_object.image_href
         )
+
+@dataclass
+class Message(ModelDataclassInterface):
+    id: int
+    body: str
+    timestamp: int
+    chat_id: int
+    author_id: int
+
+    @staticmethod
+    def from_model(model_object) -> object:
+        return Message(
+            id=model_object.id,
+            body=model_object.body,
+            timestamp=model_object.timestamp,
+            chat_id=model_object.chat_id,
+            author_id=model_object.author_id
+        )
