@@ -50,7 +50,7 @@ class TestChats(unittest.TestCase):
     
         self.assertEqual(
             (r.json(), r.status_code),
-            ([{'id': 1, 'image_href': None, 'message_ids': [], 'name': 'test chat #1', 'user_ids': [1, 2]}], 200)
+            ([{'id': 1, 'image_href': None, 'message_ids': [1, 2], 'name': 'test chat #1', 'user_ids': [1, 2]}], 200)
         )
     
     def test_request_chats_for_null_user(self):
@@ -86,6 +86,35 @@ class TestUsers(unittest.TestCase):
         global token_pointing_to_user_3
         r = requests.get(
             url='http://127.0.0.1:5010/api/data/users',
+            headers={'Authorization': token_pointing_to_user_3}
+        )
+    
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ([], 200)
+        )
+
+class TestMessages(unittest.TestCase):
+
+    def test_request_messages_for_user_in_chat(self):
+        global token_pointing_to_user_1
+        r = requests.get(
+            url='http://127.0.0.1:5010/api/data/chats/1/messages',
+            headers={'Authorization': token_pointing_to_user_1}
+        )
+    
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ([
+                {'author_id': 1,'body': 'hello world!','chat_id': 1,'id': 1,'timestamp': 1000000},
+                {'author_id': 2,'body': 'go away loser','chat_id': 1,'id': 2,'timestamp': 10000000}
+            ], 200)
+        )
+    
+    def test_request_messages_for_user_not_in_chat(self):
+        global token_pointing_to_user_3
+        r = requests.get(
+            url='http://127.0.0.1:5010/api/data/chats/1/messages',
             headers={'Authorization': token_pointing_to_user_3}
         )
     
