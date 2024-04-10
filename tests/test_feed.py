@@ -137,7 +137,7 @@ class TestStaticMessages(unittest.TestCase):
     
         self.assertEqual(
             (r.status_code),
-            (403)
+            (404)
         )
 
 class TestDynamicMessage(unittest.TestCase):
@@ -174,11 +174,7 @@ class TestDynamicMessage(unittest.TestCase):
         self.assertEqual(
             (r.json(), r.status_code),
             ({
-                'author_id': 4,
-                'body': 'i sent this message ;)',
-                'chat_id': 2,
-                'id': 4,
-                'timestamp': 1234567890
+                'msg_id': 4,
             }, 201)
         )
     
@@ -216,7 +212,55 @@ class TestDynamicMessage(unittest.TestCase):
     
         self.assertEqual(
             (r.status_code),
+            (404)
+        )
+
+    def test_delete_non_existing_message_by_user_in_chat(self):
+        global token_pointing_to_user_4
+        r = requests.delete(
+            url='http://127.0.0.1:5010/api/data/chats/2/messages/321132',
+            headers={'Authorization': token_pointing_to_user_4}
+        )
+    
+        self.assertEqual(
+            (r.status_code),
+            (404)
+        )
+    
+    def test_delete_existing_message_by_user_not_in_chat(self):
+        global token_pointing_to_user_3
+        r = requests.delete(
+            url='http://127.0.0.1:5010/api/data/chats/2/messages/4',
+            headers={'Authorization': token_pointing_to_user_3}
+        )
+    
+        self.assertEqual(
+            (r.status_code),
+            (404)
+        )
+    
+    def test_delete_existing_message_by_user_in_chat(self):
+        global token_pointing_to_user_1
+        r = requests.delete(
+            url='http://127.0.0.1:5010/api/data/chats/1/messages/2',
+            headers={'Authorization': token_pointing_to_user_1}
+        )
+    
+        self.assertEqual(
+            (r.status_code),
             (403)
+        )
+    
+    def test_delete_existing_message_by_author(self):
+        global token_pointing_to_user_4
+        r = requests.delete(
+            url='http://127.0.0.1:5010/api/data/chats/2/messages/4',
+            headers={'Authorization': token_pointing_to_user_4}
+        )
+    
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ({'msg_id': 4}, 200)
         )
 
 
