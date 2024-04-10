@@ -38,11 +38,11 @@ def convert_dataclass_to_dict(objects: list[ModelDataclassInterface]) -> list[di
 
 @dataclass
 class Chat(ModelDataclassInterface):
-    id: int
+    id: int | None
     name: str
-    image_href: str
+    image_href: str | None
     user_ids: list[str]
-    message_ids: list[str]
+    message_ids: list[str] | None
 
     @staticmethod
     def from_model(model_object) -> object:
