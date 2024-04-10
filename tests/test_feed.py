@@ -310,7 +310,85 @@ class TestChatActions(unittest.TestCase):
                 {'id': 4, 'username': 'test_4', 'alias': 'test user #4', 'image_href': default_href}
             ], 200)
         )
+    
+    def test_add_user_to_chat_user_has_no_access_to(self):
+        global token_pointing_to_user_3
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats/3/users',
+            headers={'Authorization': token_pointing_to_user_3},
+            json={'username': 'some_user'}
+        )
 
+        self.assertEqual(
+            (r.json()['Error'], r.status_code),
+            ('Cannot access requested data', 404)
+        )
+
+    def test_add_user_that_doesnt_exist(self):
+        global token_pointing_to_user_4
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats/3/users',
+            headers={'Authorization': token_pointing_to_user_4},
+            json={'username': 'some_user'}
+        )
+
+        self.assertEqual(
+            (r.json()['Error'], r.status_code),
+            ('Requested user does not exist', 404)
+        )
+    
+    def test_add_user_that_is_already_in_chat(self):
+        global token_pointing_to_user_1
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats/1/users',
+            headers={'Authorization': token_pointing_to_user_1},
+            json={'username': 'test_2'}
+        )
+
+        self.assertEqual(
+            (r.json()['Error'], r.status_code),
+            ('Requirement is already fullfilled', 406)
+        )
+    
+    def test_add_yourself(self):
+        global token_pointing_to_user_1
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats/1/users',
+            headers={'Authorization': token_pointing_to_user_1},
+            json={'username': 'test_1'}
+        )
+
+        self.assertEqual(
+            (r.json()['Error'], r.status_code),
+            ('Requirement is already fullfilled', 406)
+        )
+    
+    def test_add_valid_user(self):
+        global token_pointing_to_user_4
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats/3/users',
+            headers={'Authorization': token_pointing_to_user_4},
+            json={'username': 'test_1'}
+        )
+
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ({'id': 1, 'username': 'test_1', 'alias': 'test user #1', 'image_href': default_href}, 201)
+        )
+
+    def test_verify_user_list_after(self):
+        global token_pointing_to_user_4
+        r = requests.get(
+            url='http://127.0.0.1:5010/api/data/chats/3/users',
+            headers={'Authorization': token_pointing_to_user_4}
+        )
+
+        print(r.json())
+
+        self.assertEqual(
+            ({i['id'] for i in r.json()}, r.status_code),
+            ({1, 4}, 200)
+        )
 
 if __name__ == '__main__':
 

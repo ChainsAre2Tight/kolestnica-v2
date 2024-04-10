@@ -135,3 +135,27 @@ def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.Ot
     users = db.session.get(models.Chat, chat_id).users
 
     return dataclass.convert_model_to_dataclass(users, dataclass.OtherUser)
+
+def add_user_to_chat(sessionId: str, chat_id: int, username: str) -> dataclass.OtherUser:
+
+    user = _get_user_by_sessionId(sessionId=sessionId)
+    if chat_id not in [chat.id for chat in user.chats]:
+        raise exc.NoAcccessException
+    
+    # TODO add administative rights check
+    try:
+        user_to_add = db.session.query(models.User).filter(
+            models.User.username == username
+        ).one()
+    except sqlalchemy.exc.NoResultFound:
+        raise exc.UserNotFoundException
+    
+    # if user is already in chat
+    if chat_id in [chat.id for chat in user_to_add.chats]:
+        raise exc.RequestAlreadyFullfilledException
+
+    chat = db.session.get(models.Chat, chat_id)
+    chat.users.append(user_to_add)
+    db.session.commit()
+
+    return dataclass.OtherUser.from_model(user_to_add)

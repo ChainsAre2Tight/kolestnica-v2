@@ -52,6 +52,23 @@ def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]
     )
     return jsonify(users), 200
 
+@app.route('/api/data/chats/<int:c_id>/users', methods=['POST'])
+@require_access_token
+@handle_user_rights
+def add_user_to_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
+    """
+    This endpoint lets user add other users to the chat
+    """
+    data = request.get_json()
+    
+    user = q.add_user_to_chat(
+        sessionId=token.sessionId,
+        chat_id=c_id,
+        username=data['username']
+    )
+
+    return jsonify(user.__dict__), 201
+
 
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['GET'])
 @require_access_token
