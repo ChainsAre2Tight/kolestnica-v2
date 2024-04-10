@@ -1,11 +1,18 @@
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from typing_extensions import Literal
 
 
 @dataclass
 class Token:
     sessionId: str
     exp: int
+    typ: Literal['acc', 'ref']
+
+@dataclass
+class SignedTokenPair:
+    access: str
+    refresh: str
 
 class ModelDataclassInterface(ABC):
 
@@ -75,6 +82,9 @@ class OtherUser(ModelDataclassInterface):
     
     def to_model(self, model) -> object:
         return super().to_model(model)
+
+class CurrentUser(OtherUser):
+    pass
 
 @dataclass
 class Message(ModelDataclassInterface):

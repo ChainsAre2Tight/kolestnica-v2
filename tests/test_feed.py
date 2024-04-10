@@ -1,20 +1,13 @@
 import unittest
 import requests
 import sys
-import inspect
+from preparesuit import suite
+from globals import *
 
 if __name__ == "__main__":
     sys.path.append('../application/database')
     from db_actuator import prepare_test_environment
 
-default_href: str = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXaoP2F5I4FX1KWv3n_IRajRWfrKli9zESuXTqRgLoa89vsPBTPwEZEVyKstJ_GbXRUQg&usqp=CAU'
-corrupted_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxMjM0NTY3ODkwIiwiZXhwIjoxMDB9.CAwkokoCzrjvhyMRDaciZO0YSnMys20H4RpF8iGwT3h'
-expired_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxMjM0NTY3ODkwIiwiZXhwIjoxMDB9.CAwkokoCzrjvhyMRDaciZO0YSnMys20H4RpF8iGwT3Y'
-valid_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxMjM0NTY3ODkwIiwiZXhwIjoxMDAwMDAwMDAwMH0._XGzlL7svHZnZPM8mg4ZZRZFcPGhDlEEcgUYXSiAviU'
-token_pointing_to_user_1: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiJ2M3J5LXVuMXEtdWUxZC0xMTExIiwiZXhwIjoxMDAwMDAwMDAwMH0.jIteq0z276zQAZpofkCIxiUuX8AeezZoeLF3Cq3UZPU'
-token_pointing_to_nonexistant_user: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxLWRvLW5vdC1leGlzdCIsImV4cCI6MTAwMDAwMDAwMDB9.e_KDA2yrnnaGArunSp8WNDmuvWY07IGnWWZ83gp1GjE'
-token_pointing_to_user_3: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiJ2M3J5LXVuMXEtdWUxZC0zMzMzIiwiZXhwIjoxMDAwMDAwMDAwMH0.emJ2u5x4BHcmGE71r2gw6IdDcHb7iLk1LriAMrO-Qe8'
-token_pointing_to_user_4: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiJ2M3J5LXVuMXEtdWUxZC00NDQ0IiwiZXhwIjoxMDAwMDAwMDAwMH0.Ok6-k8tS8iC8dg1DW2NG_azr4fXxRuLhfJC7ifrrthM'
 
 class TestAvaliability(unittest.TestCase):
 
@@ -39,10 +32,10 @@ class TestAvaliability(unittest.TestCase):
         self.assertEqual(r, 401)
     
     def test_good_token(self):
-        global valid_token
+        global token_pointing_to_nonexistant_user
         r = requests.get(
             url='http://127.0.0.1:5010/api/data',
-            headers={'Authorization': valid_token}
+            headers={'Authorization': token_pointing_to_nonexistant_user}
         ).status_code
         self.assertEqual(r, 200)
 
@@ -390,47 +383,6 @@ class TestChatActions(unittest.TestCase):
             ({1, 4}, 200)
         )
 
-if __name__ == '__main__':
-
-    def isTestClass(x):
-        return inspect.isclass(x) and issubclass(x, unittest.TestCase)
-
-
-    def isTestFunction(x):
-        return inspect.isfunction(x) and x.__name__.startswith("test")
-
-    def suite():
-
-        # get current module object
-        module = sys.modules[__name__]
-
-        # get all test className,class tuples in current module
-        testClasses = [
-            tup for tup in
-            inspect.getmembers(module, isTestClass)
-        ]
-
-        # sort classes by line number
-        testClasses.sort(key=lambda t: inspect.getsourcelines(t[1])[1])
-
-        testSuite = unittest.TestSuite()
-
-        for testClass in testClasses:
-            # get list of testFunctionName,testFunction tuples in current class
-            classTests = [
-                tup for tup in
-                inspect.getmembers(testClass[1], isTestFunction)
-            ]
-
-            # sort TestFunctions by line number
-            classTests.sort(key=lambda t: inspect.getsourcelines(t[1])[1])
-
-            # create TestCase instances and add to testSuite;
-            for test in classTests:
-                testSuite.addTest(testClass[1](test[0]))
-
-        return testSuite
-
 if __name__ == "__main__":
     # prepare testSuit
     runner = unittest.TextTestRunner()
@@ -440,4 +392,4 @@ if __name__ == "__main__":
     prepare_test_environment(dbname)
 
     # run tests
-    runner.run(suite())
+    runner.run(suite(__name__))

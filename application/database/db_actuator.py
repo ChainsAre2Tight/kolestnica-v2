@@ -26,6 +26,12 @@ def prepare_test_environment(dbname: str = 'koleso2_test') -> None:
             user=test_user_1
         )
 
+        test_user_1_login = m.UserLogin(
+            login='not-so-very-unique-login',
+            pwdh='12345678901234567890123456789012',
+            user=test_user_1
+        )
+
         test_user_2 = m.User(
             username='test_2', alias='test user #2',
         )
@@ -89,7 +95,7 @@ def prepare_test_environment(dbname: str = 'koleso2_test') -> None:
         )
 
         to_add = [
-            test_user_1, test_user_1_session,
+            test_user_1, test_user_1_session, test_user_1_login,
             test_user_2, test_user_2_session,
             test_chat_1, msg_1, msg_2,
 

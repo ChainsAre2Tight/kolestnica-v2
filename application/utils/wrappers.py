@@ -28,7 +28,7 @@ def require_access_token(func):
     return decorated_function
 
 def handle_user_rights(func):
-    """Handles an instance when session that sent the request was terminated that returns a HTTP 401"""
+    """Handles exception related to user access rights and returns HTTP error responses"""
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
