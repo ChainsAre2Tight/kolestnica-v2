@@ -267,6 +267,36 @@ class TestDynamicMessage(unittest.TestCase):
             ({'msg_id': 4}, 200)
         )
 
+class TestChatActions(unittest.TestCase):
+
+    def test_create_chat(self):
+        global token_pointing_to_user_4
+        r = requests.post(
+            url='http://127.0.0.1:5010/api/data/chats',
+            headers={'Authorization': token_pointing_to_user_4},
+            json={'chat_name': 'dynamically created chat'}
+        )
+    
+        self.assertEqual(
+            (r.json()['chat_id'], r.status_code),
+            (3, 201)
+        )
+    
+    def test_verify_chat_creation(self):
+        global token_pointing_to_user_4
+        r = requests.get(
+            url='http://127.0.0.1:5010/api/data/chats',
+            headers={'Authorization': token_pointing_to_user_4}
+        )
+
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ([
+                {'id': 2, 'image_href': None, 'message_ids': [3], 'name': 'test chat #2 dynamic', 'user_ids': [4]},
+                {'id': 3, 'image_href': None, 'message_ids': [], 'name': 'dynamically created chat', 'user_ids': [4]}
+            ], 200)
+        )
+
 
 if __name__ == '__main__':
 
