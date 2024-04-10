@@ -42,5 +42,9 @@ def handle_user_rights(func):
             return jsonify({'Error': 'Cannot access requested data'}), 404
         except exc.NotPermittedException:
             return jsonify({'Error': "Action is prohibited"}), 403
+        except exc.UserNotFoundException:
+            return jsonify({'Error': 'Requested user does not exist'}), 404
+        except exc.RequestAlreadyFullfilledException:
+            return jsonify({'Error': "Requirement is already fullfilled"}), 406
     
     return decorated_function
