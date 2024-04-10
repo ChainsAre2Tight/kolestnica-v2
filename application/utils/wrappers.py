@@ -34,6 +34,8 @@ def handle_user_rights(func):
     def decorated_function(*args, **kwargs):
         try:
             return func(*args, **kwargs)
+        except KeyError:
+            return jsonify({'Error': 'Missing data'}), 400
         except exc.UserNotExistsException:
             return jsonify({"Error": "Bad session data"}), 401
         except exc.NoAcccessException:
