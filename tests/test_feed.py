@@ -3,6 +3,10 @@ import requests
 import sys
 import inspect
 
+if __name__ == "__main__":
+    sys.path.append('../application/database')
+    from db_actuator import prepare_test_environment
+
 default_href: str = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXaoP2F5I4FX1KWv3n_IRajRWfrKli9zESuXTqRgLoa89vsPBTPwEZEVyKstJ_GbXRUQg&usqp=CAU'
 corrupted_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxMjM0NTY3ODkwIiwiZXhwIjoxMDB9.CAwkokoCzrjvhyMRDaciZO0YSnMys20H4RpF8iGwT3h'
 expired_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiIxMjM0NTY3ODkwIiwiZXhwIjoxMDB9.CAwkokoCzrjvhyMRDaciZO0YSnMys20H4RpF8iGwT3Y'
@@ -305,5 +309,13 @@ if __name__ == '__main__':
 
         return testSuite
 
+if __name__ == "__main__":
+    # prepare testSuit
     runner = unittest.TextTestRunner()
+
+    # reset database
+    dbname = 'koleso2_test'
+    prepare_test_environment(dbname)
+
+    # run tests
     runner.run(suite())
