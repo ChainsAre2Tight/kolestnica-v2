@@ -109,4 +109,20 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
     db.session.commit()
 
     return msg_to_delete
+
+def create_chat(sessioId: str, chat_name: str) -> dataclass.Chat:
+    
+    # get user data
+    user = _get_user_by_sessionId(sessionId=sessioId)
+
+    # create chat
+    chat = models.Chat(
+        name=chat_name,
+        users=[user]
+    )
+    db.session.add(chat)
+    db.session.commit()
+
+    # return its data
+    return dataclass.Chat.from_model(chat)
     

@@ -71,6 +71,7 @@ def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
         chat_id=c_id,
         author_id=None
     )
+
     # send to database and fill missing message data
     processesed_message = q.store_message(
         sessionId=token.sessionId,
@@ -87,7 +88,7 @@ def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
 @app.route('/api/data/chats/<int:c_id>/messages/<int:m_id>', methods=['DELETE'])
 @require_access_token
 @handle_user_rights
-def delete_message(token: dataclass.Token, c_id: int, m_id: int):
+def delete_message(token: dataclass.Token, c_id: int, m_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to delete message by its author
     """
@@ -99,3 +100,26 @@ def delete_message(token: dataclass.Token, c_id: int, m_id: int):
 
     # return success tu user
     return jsonify({'msg_id': msg_to_delete['msg_id']}), 200
+
+@app.route('/api/data/chats', methods=['POST'])
+@require_access_token
+@handle_user_rights
+def create_chat(token: dataclass.Token) -> tuple[Response, int]:
+    """
+    This endpoint provides a mean to create a new chat
+    """
+
+    # get chat data from user
+    data = request.get_json()
+
+    # store it into database
+    chat = q.create_chat(sessioId=token.sessionId, chat_name=data['chat_name'])
+
+    # send request to user server to generate encryption key
+    pass # TODO make it)
+
+    # send response
+    return jsonify({
+        'chat_id': chat.id,
+        'image_href': chat.image_href
+        }), 201
