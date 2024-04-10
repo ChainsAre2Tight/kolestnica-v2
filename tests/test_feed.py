@@ -296,6 +296,20 @@ class TestChatActions(unittest.TestCase):
                 {'id': 3, 'image_href': None, 'message_ids': [], 'name': 'dynamically created chat', 'user_ids': [4]}
             ], 200)
         )
+    
+    def test_verify_user_list_before(self):
+        global token_pointing_to_user_4
+        r = requests.get(
+            url='http://127.0.0.1:5010/api/data/chats/3/users',
+            headers={'Authorization': token_pointing_to_user_4}
+        )
+
+        self.assertEqual(
+            (r.json(), r.status_code),
+            ([
+                {'id': 4, 'username': 'test_4', 'alias': 'test user #4', 'image_href': default_href}
+            ], 200)
+        )
 
 
 if __name__ == '__main__':

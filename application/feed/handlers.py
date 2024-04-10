@@ -40,6 +40,19 @@ def get_users(token: dataclass.Token) -> tuple[Response, int]:
     )
     return jsonify(users), 200
 
+@app.route('/api/data/chats/<int:c_id>/users', methods=['GET'])
+@require_access_token
+@handle_user_rights
+def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
+    """
+    This endpoint provides a way to yield all users of a certain chat if user has access to it
+    """
+    users = dataclass.convert_dataclass_to_dict(
+        q.get_users_of_certain_chat(token.sessionId, c_id)
+    )
+    return jsonify(users), 200
+
+
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['GET'])
 @require_access_token
 @handle_user_rights

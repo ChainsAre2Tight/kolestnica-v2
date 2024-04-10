@@ -126,3 +126,12 @@ def create_chat(sessioId: str, chat_name: str) -> dataclass.Chat:
     # return its data
     return dataclass.Chat.from_model(chat)
     
+def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.OtherUser]:
+    
+    user = _get_user_by_sessionId(sessionId=sessionId)
+    if chat_id not in [chat.id for chat in user.chats]:
+        raise exc.NoAcccessException
+    
+    users = db.session.get(models.Chat, chat_id).users
+
+    return dataclass.convert_model_to_dataclass(users, dataclass.OtherUser)
