@@ -2,8 +2,7 @@ from functools import wraps
 from flask import request, jsonify
 import jwt
 import json
-from sqlalchemy.exc import NoResultFound
-from utils.my_exceptions import NoAcccessException
+import utils.my_exceptions as exc
 
 from utils.my_dataclasses import Token
 
@@ -35,9 +34,11 @@ def handle_user_rights(func):
     def decorated_function(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except NoResultFound:
-            return jsonify({"Error": "User doesn't exist"}), 401
-        except NoAcccessException:
-            return jsonify({'Error': 'Cannot access requested data'}), 403
+        except exc.UserNotExistsException:
+            return jsonify({"Error": "Bad session data"}), 401
+        except exc.NoAcccessException:
+            return jsonify({'Error': 'Cannot access requested data'}), 404
+        except exc.NotPermittedException:
+            return jsonify({'Error': "Action is prohibited"}), 403
     
     return decorated_function
