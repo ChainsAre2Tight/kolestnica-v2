@@ -12,7 +12,18 @@ class ModelDataclassInterface(ABC):
     @staticmethod
     @abstractmethod
     def from_model(model_object) -> object:
-        """Constructs a dataclass object from SQLAlcmemy model object"""
+        """
+        Constructs a dataclass object from SQLAlcmemy model object
+        :param model_object: Specifies a SQLAlchemy object to conver
+        """
+        pass
+
+    @abstractmethod
+    def to_model(self, model) -> object:
+        """
+        Constructs a SQLAlchemy object from dataclass object
+        :param model: Specifies a SQLAlchemy model
+        """
         pass
 
 def convert_model_to_dataclass(objects: list, target_dataclass: ModelDataclassInterface) -> list[object]:
@@ -42,6 +53,9 @@ class Chat(ModelDataclassInterface):
             message_ids=[msg.id for msg in model_object.messages],
             user_ids=[user.id for user in model_object.users]
         )
+    
+    def to_model(self, model) -> object:
+        return super().to_model(model)
 
 @dataclass
 class OtherUser(ModelDataclassInterface):
@@ -58,14 +72,17 @@ class OtherUser(ModelDataclassInterface):
             alias=model_object.alias,
             image_href=model_object.image_href
         )
+    
+    def to_model(self, model) -> object:
+        return super().to_model(model)
 
 @dataclass
 class Message(ModelDataclassInterface):
-    id: int
+    id: int | None
     body: str
     timestamp: int
     chat_id: int
-    author_id: int
+    author_id: int | None
 
     @staticmethod
     def from_model(model_object) -> object:
@@ -75,4 +92,12 @@ class Message(ModelDataclassInterface):
             timestamp=model_object.timestamp,
             chat_id=model_object.chat_id,
             author_id=model_object.author_id
+        )
+    
+    def to_model(self, model) -> object:
+        return model(
+            body=self.body,
+            timestamp=self.timestamp,
+            chat_id=self.chat_id,
+            author_id=self.author_id
         )
