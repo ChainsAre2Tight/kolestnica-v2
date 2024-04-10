@@ -5,8 +5,11 @@ import sqlalchemy.exc
 import utils.my_exceptions as exc
 
 def _get_user_by_sessionId(sessionId: str) -> models.User:
-    return db.session.query(models.Session).\
-        filter(models.Session.uuid == sessionId).one().user
+    try:
+        return db.session.query(models.Session).\
+            filter(models.Session.uuid == sessionId).one().user
+    except sqlalchemy.exc.NoResultFound:
+        raise exc.UserNotExistsException
 
 
 def _get_chats_by_session(user: models.User) -> list[models.Chat]:
@@ -64,8 +67,7 @@ def get_messages_by_chat_id(chat_id: int, sessionId: str) -> list[dataclass.Mess
         dataclass.Message
     )
 
-def store_message(sessionId: str, \
-                  message: dataclass.Message) -> dataclass.Message:
+def store_message(sessionId: str, message: dataclass.Message) -> dataclass.Message:
     
     # get user info from database
     user = _get_user_by_sessionId(sessionId=sessionId)
@@ -80,4 +82,31 @@ def store_message(sessionId: str, \
     message.id = model_message.id
 
     return message
+
+def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, int]:
+
+    # get user info from database
+    user = _get_user_by_sessionId(sessionId=sessionId)
+    if chat_id not in [chat.id for chat in user.chats]:
+        raise exc.NoAcccessException
+
+    # get message info from database
+    try:
+        message = db.session.query(models.Message).filter(
+            models.Message.id == message_id,
+            models.Message.chat_id == chat_id
+        ).one()
+    except sqlalchemy.exc.NoResultFound:
+        raise exc.NoAcccessException
+
+    # verify his authorship
+    if message.author_id != user.id:
+        raise exc.NotPermittedException
+
+    # delete message
+    msg_to_delete = {'chat_id': message.chat_id, 'msg_id': message.id}
+    db.session.delete(message)
+    db.session.commit()
+
+    return msg_to_delete
     

@@ -80,4 +80,22 @@ def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     pass # TODO send data to notification server
 
     # return success to user
-    return jsonify(processesed_message.__dict__), 201
+    return jsonify({
+        'msg_id': processesed_message.id
+    }), 201
+
+@app.route('/api/data/chats/<int:c_id>/messages/<int:m_id>', methods=['DELETE'])
+@require_access_token
+@handle_user_rights
+def delete_message(token: dataclass.Token, c_id: int, m_id: int):
+    """
+    This endpoint provides a way to delete message by its author
+    """
+    # try to delete message
+    msg_to_delete = q.delete_message(sessionId=token.sessionId, chat_id=c_id, message_id=m_id)
+
+    # if successfull, send message data to notification server
+    pass # TODO send data to notification server
+
+    # return success tu user
+    return jsonify({'msg_id': msg_to_delete['msg_id']}), 200
