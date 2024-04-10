@@ -40,24 +40,24 @@ def get_users(token: dataclass.Token) -> tuple[Response, int]:
     )
     return jsonify(users), 200
 
-@app.route('/api/data/chats/<int:id>/messages', methods=['GET'])
+@app.route('/api/data/chats/<int:c_id>/messages', methods=['GET'])
 @require_access_token
 @handle_user_rights
-def get_messages_by_chat(token: dataclass.Token, id: int) -> tuple[Response, int]:
+def get_messages_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to get all mesages \
     within a specified chat if a user has access to it
     """
 
     messages = dataclass.convert_dataclass_to_dict(
-        q.get_messages_by_chat_id(chat_id=id, sessionId=token.sessionId)
+        q.get_messages_by_chat_id(chat_id=c_id, sessionId=token.sessionId)
     )
     return jsonify(messages), 200
 
-@app.route('/api/data/chats/<int:id>/messages', methods=['POST'])
+@app.route('/api/data/chats/<int:c_id>/messages', methods=['POST'])
 @require_access_token
 @handle_user_rights
-def send_message(token: dataclass.Token, id: int) -> tuple[Response, int]:
+def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint serves to provide a way to send new messages\
         to database and notify all clients that can access it
@@ -68,7 +68,7 @@ def send_message(token: dataclass.Token, id: int) -> tuple[Response, int]:
         id=None,
         body=data['body'],
         timestamp=data['timestamp'],
-        chat_id=id,
+        chat_id=c_id,
         author_id=None
     )
     # send to database and fill missing message data
