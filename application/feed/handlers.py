@@ -1,6 +1,6 @@
 from flask import jsonify, request, make_response, Response
 
-from utils.wrappers import require_access_token, handle_user_rights
+from utils.wrappers import require_access_token, handle_http_exceptions
 import utils.my_dataclasses as dataclass
 from feed.app import app
 import feed.queries as q
@@ -14,7 +14,7 @@ def ping(_) -> tuple[Response, int]:
 
 @app.route('/api/data/chats', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def get_chats(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a way to get all chats\
@@ -28,7 +28,7 @@ def get_chats(token: dataclass.Token) -> tuple[Response, int]:
 
 @app.route('/api/data/users', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def get_users(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a way to get info of users\
@@ -42,7 +42,7 @@ def get_users(token: dataclass.Token) -> tuple[Response, int]:
 
 @app.route('/api/data/chats/<int:c_id>/users', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to yield all users of a certain chat if user has access to it
@@ -54,7 +54,7 @@ def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]
 
 @app.route('/api/data/chats/<int:c_id>/users', methods=['POST'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def add_user_to_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint lets user add other users to the chat
@@ -72,7 +72,7 @@ def add_user_to_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
 
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def get_messages_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to get all mesages \
@@ -86,7 +86,7 @@ def get_messages_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, i
 
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['POST'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint serves to provide a way to send new messages\
@@ -117,7 +117,7 @@ def send_message(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
 
 @app.route('/api/data/chats/<int:c_id>/messages/<int:m_id>', methods=['DELETE'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def delete_message(token: dataclass.Token, c_id: int, m_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to delete message by its author
@@ -133,7 +133,7 @@ def delete_message(token: dataclass.Token, c_id: int, m_id: int) -> tuple[Respon
 
 @app.route('/api/data/chats', methods=['POST'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def create_chat(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a mean to create a new chat

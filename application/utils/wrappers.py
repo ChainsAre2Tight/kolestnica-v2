@@ -4,7 +4,7 @@ from flask import request, jsonify
 import jwt
 import json
 import utils.my_exceptions as exc
-from flask import Response
+from flask import Response, make_response
 import os
 from typing_extensions import Literal
 
@@ -120,24 +120,54 @@ def require_refresh_token(
     
     return decorated_function
 
-def handle_user_rights(func):
-    """Handles exception related to user access rights and returns HTTP error responses"""
+def handle_http_exceptions(
+            func: Callable | None = None,
+            options: dict=None
+        ) -> Callable | tuple[Response, int]:
+    """
+    Handles exception related to user access rights and returns HTTP error responses
+    """
 
+    if func is None:
+        return partial(handle_http_exceptions)
+    
+    def make_err_response(
+            description: str,
+            error: Exception
+        ) -> Response:
+
+        try:
+            details = error.args[0]
+        except IndexError:
+            details = 'No details provided'
+
+        return make_response(
+            jsonify({
+                'Status': 'Error',
+                'Error': description,
+                'Details': details
+            })
+        )
+    
     @wraps(func)
     def decorated_function(*args, **kwargs):
+
         try:
             return func(*args, **kwargs)
-        except KeyError:
-            return jsonify({'Error': 'Missing data'}), 400
-        except exc.UserNotExistsException:
-            return jsonify({"Error": "Bad session data"}), 401
-        except exc.NoAcccessException:
-            return jsonify({'Error': 'Cannot access requested data'}), 404
-        except exc.NotPermittedException:
-            return jsonify({'Error': "Action is prohibited"}), 403
-        except exc.UserNotFoundException:
-            return jsonify({'Error': 'Requested user does not exist'}), 404
-        except exc.RequestAlreadyFullfilledException:
-            return jsonify({'Error': "Requirement is already fullfilled"}), 406
+        
+        except KeyError as e:
+            return make_err_response('Missing data', e), 400
+        except exc.UserNotExistsException as e:
+            return make_err_response("Bad session data", e), 401
+        except exc.NoAcccessException as e:
+            return make_err_response('Cannot access requested data', e), 404
+        except exc.NotPermittedException as e:
+            return make_err_response("Action is prohibited", e), 403
+        except exc.UserNotFoundException as e:
+            return make_err_response('Requested user does not exist', e), 404
+        except exc.RequestAlreadyFullfilledException as e:
+            return make_err_response("Requirement is already fullfilled", e), 406
+        except exc.DeprecatedRefreshToken as e:
+            return make_err_response("Refresk token is invalid or has expired", e), 401
     
     return decorated_function

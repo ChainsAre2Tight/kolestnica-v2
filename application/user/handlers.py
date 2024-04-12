@@ -1,7 +1,7 @@
 from flask import request, Response, make_response, jsonify
 
 from user.app import app
-from utils.wrappers import require_access_token, handle_user_rights, require_refresh_token
+from utils.wrappers import require_access_token, handle_http_exceptions, require_refresh_token
 import utils.my_dataclasses as dataclass
 import user.queries as q
 import utils.my_exceptions as exc
@@ -48,7 +48,7 @@ def ping(_) -> tuple[Response, int]:
 
     return jsonify('pinged'), 200
 
-@app.route('/api/auth/register', methods=['POST'])
+@app.route('/api/auth/register', methods=['POST']) # TODO move to wrapper exception handling
 def register_user() -> tuple[Response, int]:
     data = request.get_json()
 
@@ -114,7 +114,7 @@ def login_user() -> tuple[Response, int]:
 
 @app.route('/api/auth/logout', methods=['POST'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def logout_user(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint logs user out of their account and terminates their session
@@ -142,7 +142,7 @@ def logout_user(token: dataclass.Token) -> tuple[Response, int]:
 
 @app.route('/api/auth/account', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def view_account_data(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint returns all alivable personal data for the requesting account
@@ -152,7 +152,7 @@ def view_account_data(token: dataclass.Token) -> tuple[Response, int]:
 
 @app.route('/api/auth/account/sessions', methods=['GET'])
 @require_access_token
-@handle_user_rights
+@handle_http_exceptions
 def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint lists all active sessions of the requesting account
@@ -167,6 +167,7 @@ def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
 
 @app.route('/api/auth/refresh-tokens', methods=['POST'])
 @require_refresh_token
+@handle_http_exceptions
 def refresh_tokens(
         raw_token: str,
         refresh_token: dataclass.Token,
