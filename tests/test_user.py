@@ -4,6 +4,9 @@ from globals import *
 from preparesuit import suite
 import requests
 
+token_new: str = ''
+token_new_2: str = ''
+
 if __name__ == '__main__':
 
     sys.path.append('../application/database')
@@ -45,7 +48,6 @@ class TestUserCreation(unittest.TestCase):
     def test_missing_data(self):
         r = requests.post(
             url='http://127.0.0.1:5020/api/auth/register',
-            headers={'Authorization': token_pointing_to_nonexistant_user},
             json={'some': 'data', 'is': 'missing'}
         ).status_code
         self.assertEqual(r, 400)
@@ -53,11 +55,10 @@ class TestUserCreation(unittest.TestCase):
     def test_duplicate_login(self):
         r = requests.post(
             url='http://127.0.0.1:5020/api/auth/register',
-            headers={'Authorization': token_pointing_to_nonexistant_user},
             json={
-                'username': 'some_uniaue_username',
+                'username': 'some_unique_username',
                 'login': 'not-so-very-unique-login',
-                'pdwh': '12345678901234567890123456789012'
+                'pwdh': '12345678901234567890123456789012'
             }
         ).status_code
         self.assertEqual(r, 409)
@@ -65,11 +66,10 @@ class TestUserCreation(unittest.TestCase):
     def test_duplicate_username(self):
         r = requests.post(
             url='http://127.0.0.1:5020/api/auth/register',
-            headers={'Authorization': token_pointing_to_nonexistant_user},
             json={
                 'username': 'test_1',
                 'login': 'very-unique-login',
-                'pdwh': '12345678901234567890123456789012'
+                'pwdh': '12345678901234567890123456789012'
             }
         ).status_code
         self.assertEqual(r, 406)
@@ -77,14 +77,150 @@ class TestUserCreation(unittest.TestCase):
     def test_valid_data(self):
         r = requests.post(
             url='http://127.0.0.1:5020/api/auth/register',
-            headers={'Authorization': token_pointing_to_nonexistant_user},
             json={
                 'username': 'very-unique-username',
                 'login': 'very-unique-login',
-                'pdwh': '12345678901234567890123456789012'
+                'pwdh': '12345678901234567890123456789012'
             }
         ).status_code
         self.assertEqual(r, 201)
+
+class TestUserLogin(unittest.TestCase):
+
+    def test_login_to_nonexistant_account(self):
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/login',
+            json={
+                'login': 'I_do_not_exist',
+                'pwdh': '12345678901234567890123456789012',
+                'fingerprint': 'doesnt-matter-but-unique'
+            }
+        ).status_code
+        self.assertEqual(r, 404)
+    
+    def test_fresh_login_to_existing_account(self):
+        global token_new
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/login',
+            json={
+                'login': 'very-unique-login',
+                'pwdh': '12345678901234567890123456789012',
+                'fingerprint': 'matters-and-is-unique'
+            }
+        )
+        self.assertEqual(r.status_code, 201)
+
+        token_new = r.json()['data']['access']
+        self.assertEqual(
+            set(list(r.json()['data'].keys())),
+            {'access', 'expiry'}
+        )
+    
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_new}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+            len(r.json()['data']['sessions']),
+            1
+        )
+        self.assertEqual(
+            r.json()['data']['sessions'][0]['uuid'],
+            'matters-and-is-unique'
+        )
+    
+    def test_login_to_the_same_account_from_another_device(self):
+        global token_new_2
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/login',
+            json={
+                'login': 'very-unique-login',
+                'pwdh': '12345678901234567890123456789012',
+                'fingerprint': 'matters-but-isnt-unique'
+            }
+        )
+        self.assertEqual(r.status_code, 201)
+
+        token_new_2 = r.json()['data']['access']
+        self.assertEqual(
+            set(list(r.json()['data'].keys())),
+            {'access', 'expiry'}
+        )
+
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_new_2}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+                len(r.json()['data']['sessions']),
+                2
+        )
+        self.assertEqual(
+            set(el['uuid'] for el in r.json()['data']['sessions']),
+            {
+                'matters-and-is-unique',
+                'matters-but-isnt-unique'
+            }
+        )
+
+    def test_login_to_test_1_from_the_same_browser(self):
+        global token_new
+
+        # relogin
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/login',
+            json={
+                'login': 'not-so-very-unique-login',
+                'pwdh': '12345678901234567890123456789012',
+                'fingerprint': 'matters-but-isnt-unique'
+            }
+        )
+        self.assertEqual(r.status_code, 201)
+
+        # check that response included tokens
+        token_test_1 = r.json()['data']['access']
+        self.assertEqual(
+            set(list(r.json()['data'].keys())),
+            {'access', 'expiry'}
+        )
+
+        # check session was terminated
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_new}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+                len(r.json()['data']['sessions']),
+                1
+        )
+        self.assertEqual(
+            set(el['uuid'] for el in r.json()['data']['sessions']),
+            {
+                'matters-and-is-unique',
+            }
+        )
+
+        # check that new session appeared
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_test_1}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+                len(r.json()['data']['sessions']),
+                2
+        )
+        self.assertEqual(
+            set(el['uuid'] for el in r.json()['data']['sessions']),
+            {
+                'matters-but-isnt-unique',
+                'v3ry-un1q-ue1d-1111'
+            }
+        )
+
 
     
 if __name__ == "__main__":
