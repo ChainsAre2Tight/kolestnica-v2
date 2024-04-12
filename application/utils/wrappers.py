@@ -1,27 +1,58 @@
-from functools import wraps
+from functools import wraps, partial
+from typing import Callable
 from flask import request, jsonify
 import jwt
 import json
 import utils.my_exceptions as exc
+from flask import Response
+import os
 
 from utils.my_dataclasses import Token
 
-def require_access_token(func):
-    """Provides an interface to check for access token provided in a request and access its data"""
+TokenPublicKey = os.environ.get('TOKEN-OPEN-KEY') or 'secret'
+
+def require_access_token(
+        func: Callable | None=None,
+        verify_expiry: bool | None = True
+    ) -> tuple[Response, int] | Callable:
+    """
+    Checks for an access token in the request header and provides its decoded data to decorated function
+
+    :params verify_exp: optional parameter, if set to True skips token expiration check
+    :returns:
+        decorated function if token verification passes
+        HTTP 401 if token signature check failes
+        HTTP 403 if token was expired
+    """
+
+    if func is None:
+        return partial(require_access_token)
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        global TokenPublicKey
         try:
             raw_token: str = dict(request.headers)['Authorization']
             token: Token = Token(
-                **jwt.decode(raw_token, algorithms=['HS256'], verify=True, key='secret')
+                **jwt.decode(
+                        raw_token,
+                        algorithms=['HS256'],
+                        verify=True,
+                        key=TokenPublicKey,
+                        options={'verify_exp': verify_expiry}
+                    )
                 )
-        except (KeyError, json.JSONDecodeError): #TODO remove this in production
-            return jsonify({'Error': 'Missing access token'}), 400
-        except (jwt.DecodeError, jwt.InvalidSignatureError):
-            return jsonify({'Error': 'Bad access token'}), 403
+        
+        except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
+            return jsonify({
+                'Staus': 'Error',
+                'details': 'Access token is missing or is invalid'
+            }), 401
         except jwt.ExpiredSignatureError:
-            return jsonify({'Error': 'Expired access token'}), 401
+            return jsonify({
+                'Staus': 'Error',
+                'details': 'Access token is expired'
+            }), 403
         
         return func(token, *args, **kwargs)
     
