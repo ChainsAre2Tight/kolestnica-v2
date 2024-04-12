@@ -27,3 +27,6 @@ class InvalidLoginData(BaseException):
 
 class AlreadyLoggedIn(BaseException):
     """Raised when user tries to log in to different account from the same session"""
+
+class DeprecatedRefreshToken(BaseException):
+    """Raised when user tries to refresh token pair with an old or invalid refresh token"""
