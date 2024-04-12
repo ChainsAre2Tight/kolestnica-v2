@@ -6,6 +6,7 @@ import requests
 
 token_new: str = ''
 token_new_2: str = ''
+token_test_1: str = ''
 
 if __name__ == '__main__':
 
@@ -166,7 +167,7 @@ class TestUserLogin(unittest.TestCase):
         )
 
     def test_login_to_test_1_from_the_same_browser(self):
-        global token_new
+        global token_new, token_test_1
 
         # relogin
         r = requests.post(
@@ -220,8 +221,63 @@ class TestUserLogin(unittest.TestCase):
                 'v3ry-un1q-ue1d-1111'
             }
         )
+    
+    def test_logout_user_1(self):
+        # check that new session appeared
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_test_1}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+                len(r.json()['data']['sessions']),
+                2
+        )
+        self.assertEqual(
+            set(el['uuid'] for el in r.json()['data']['sessions']),
+            {
+                'matters-but-isnt-unique',
+                'v3ry-un1q-ue1d-1111'
+            }
+        )
 
+        # logout once
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/logout',
+            headers={'Authorization': token_test_1}
+        )
+        self.assertEqual(r.status_code, 200)
 
+        # check that session dissapeared
+        r = requests.get(
+            url='http://127.0.0.1:5020/api/auth/account/sessions',
+            headers={'Authorization': token_pointing_to_user_1}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(
+                len(r.json()['data']['sessions']),
+                1
+        )
+        self.assertEqual(
+            set(el['uuid'] for el in r.json()['data']['sessions']),
+            {
+                'v3ry-un1q-ue1d-1111'
+            }
+        )
+
+        # logout once again
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/logout',
+            headers={'Authorization': token_test_1}
+        )
+        self.assertEqual(r.status_code, 410)
+    
+    def test_logout_of_nonexistant_account(self):
+        r = requests.post(
+            url='http://127.0.0.1:5020/api/auth/logout',
+            headers={'Authorization': token_pointing_to_nonexistant_user}
+        )
+        self.assertEqual(r.status_code, 410)
     
 if __name__ == "__main__":
     # prepare testSuit

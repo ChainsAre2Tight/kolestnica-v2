@@ -94,7 +94,7 @@ def logout_user(token: dataclass.Token) -> tuple[Response, int]:
     except exc.SessionNotFound:
         payload, status = {
             'Status': 'Gone',
-            'details': 'Session was already terminated'
+            'details': 'Session was already terminated or didnt exist in the first place'
         }, 410
     
     response = make_response(jsonify(payload))
