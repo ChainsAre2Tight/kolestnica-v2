@@ -16,7 +16,7 @@ def _sign_token(token: Token, config: DefaultTokenConfig) -> str:
         algorithm=config.algorithm
     )
 
-def create_token_pair(sessionId, config: DefaultTokenConfig) -> SignedTokenPair:
+def create_token_pair(sessionId: str, config: DefaultTokenConfig) -> SignedTokenPair:
     timestamp = int(datetime.datetime.now().timestamp())
     acc_exp = timestamp + config.access_lifetime
     ref_exp = timestamp + config.refresh_lifetime

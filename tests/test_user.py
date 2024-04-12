@@ -278,6 +278,22 @@ class TestUserLogin(unittest.TestCase):
             headers={'Authorization': token_pointing_to_nonexistant_user}
         )
         self.assertEqual(r.status_code, 410)
+
+
+class TestRefreshToken(unittest.TestCase):
+
+    def test_no_refresh_token(self):
+        self.fail()
+    
+    def test_refresh_token_pointing_nowhere(self):
+        self.fail()
+    
+    def test_refresh_token_pair(self):
+        self.fail()
+    
+    def test_refresh_check_token_is_replaced(self):
+        self.fail()
+    
     
 if __name__ == "__main__":
     # prepare testSuit

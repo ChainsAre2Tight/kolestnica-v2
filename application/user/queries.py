@@ -169,3 +169,35 @@ def list_active_sessions(sessionId: str) -> list[dataclass.Session]:
         user.sessions,
         dataclass.Session
     )
+
+def refresh_tokens(
+        raw_token: str,
+        refresh: dataclass.Token
+    ) -> dataclass.SignedTokenPair:
+    """
+    Checks credibility of provided refresh token and returns a new token pair
+
+    :params:
+        str raw_token: encoded token to check it corresponds to the one stored in database
+        dataclass.Token: dataclass object containing decoded token data
+    
+    :returns dataclass.SignedTokenPair: dataclass object containing the new token pair
+    :raises exc.DeprecatedRefreshToken: if provided refresh token doesnt match the one stored in the database
+    """
+    try:
+        session = db.session.query(models.Session).filter(
+            models.Session.uuid == refresh.sessionId,
+            models.Session.refresh_token == raw_token
+        ).one()
+    except sqlalchemy.exc.NoResultFound:
+        raise exc.DeprecatedRefreshToken
+    
+    new_token_pair = tokens.create_token_pair(
+        sessionId=refresh.sessionId,
+        config=tokens.DefaultTokenConfig
+    )
+
+    session.refresh_token = new_token_pair.refresh
+    db.session.commit()
+
+    return new_token_pair

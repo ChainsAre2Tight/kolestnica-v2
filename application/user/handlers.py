@@ -1,7 +1,7 @@
 from flask import request, Response, make_response, jsonify
 
 from user.app import app
-from utils.wrappers import require_access_token, handle_user_rights
+from utils.wrappers import require_access_token, handle_user_rights, require_refresh_token
 import utils.my_dataclasses as dataclass
 import user.queries as q
 import utils.my_exceptions as exc
@@ -14,9 +14,7 @@ def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenP
     :params SignedTokenPair token_pair: signed token pair dataclass
     :returns: modified response_data dictionary
     """
-    try:
-        _ = response_data['data']
-    except KeyError:
+    if 'data' not in response_data.keys():
         response_data['data'] = dict()
     
     response_data['data']['access'] = token_pair.access
@@ -41,7 +39,7 @@ def provide_refresh_token(response: Response, token_pair: dataclass.SignedTokenP
             expires=token_pair.refresh_expiry
         )
     
-    return Response
+    return response
 
 @app.route('/api/auth', methods=['GET'])
 @require_access_token
@@ -168,9 +166,35 @@ def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
     }), 200
 
 @app.route('/api/auth/refresh-tokens', methods=['POST'])
-@require_access_token
-def refresh_tokens(token: dataclass.Token) -> tuple[Response, int]:
+@require_refresh_token
+def refresh_tokens(
+        raw_token: str,
+        refresh_token: dataclass.Token,
+    ) -> tuple[Response, int]:
     """
     This endpoint provides user with a refreshed token pair upon request
     """
-    return '', 501
+
+    new_token_pair = q.refresh_tokens(
+        raw_token=raw_token,
+        refresh=refresh_token
+    )
+
+    response_data: dict = provide_access_token(
+        {
+            'status': 'updated',
+            'data': {}
+        },
+        token_pair=new_token_pair
+        )
+
+    response = make_response(
+        jsonify(response_data)
+    )
+
+    response = provide_refresh_token(
+        response,
+        token_pair=new_token_pair
+    )
+
+    return response, 201
