@@ -169,5 +169,13 @@ def handle_http_exceptions(
             return make_err_response("Requirement is already fullfilled", e), 406
         except exc.DeprecatedRefreshToken as e:
             return make_err_response("Refresk token is invalid or has expired", e), 401
+        except exc.DuplicateLoginException as e:
+            return make_err_response('An account assosiated with this login already exists', e), 409
+        except exc.DuplicateUsernameException as e:
+            return make_err_response('This username was already taken by another user', e), 406
+        except exc.InvalidLoginData as e:
+            return make_err_response('Invalid login or password', e), 404
+        except exc.SessionNotFound as e:
+            return make_err_response('Session was already terminated or didnt exist in the first place', e), 410
     
     return decorated_function

@@ -4,7 +4,6 @@ from user.app import app
 from utils.wrappers import require_access_token, handle_http_exceptions, require_refresh_token
 import utils.my_dataclasses as dataclass
 import user.queries as q
-import utils.my_exceptions as exc
 
 def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenPair) -> dict:
     """
@@ -43,74 +42,54 @@ def provide_refresh_token(response: Response, token_pair: dataclass.SignedTokenP
 
 @app.route('/api/auth', methods=['GET'])
 @require_access_token
+@handle_http_exceptions
 def ping(_) -> tuple[Response, int]:
     """This endpoint provides a way to check service avaliability"""
 
     return jsonify('pinged'), 200
 
-@app.route('/api/auth/register', methods=['POST']) # TODO move to wrapper exception handling
+@app.route('/api/auth/register', methods=['POST'])
+@handle_http_exceptions
 def register_user() -> tuple[Response, int]:
     data = request.get_json()
 
-    try:
-        _ = q.create_user(
-            data['username'],
-            data['login'],
-            data['pwdh']
-        )
+    _ = q.create_user(
+        data['username'],
+        data['login'],
+        data['pwdh']
+    )
 
-        return jsonify({'Status': 'OK'}), 201
-
-    except KeyError:
-        return jsonify({'status': 'Error',
-            'details': 'Missing data'}), 400
-    except exc.DuplicateLoginException:
-        return jsonify({'status': 'Error',
-            'details': 'An account assosiated with this login already exists'}), 409
-    except exc.DuplicateUsernameException:
-        return jsonify({'status': 'Error',
-            'details': 'This username was already taken by another user'}), 406
+    return jsonify({'Status': 'OK'}), 201
 
 @app.route('/api/auth/login', methods=['POST'])
+@handle_http_exceptions
 def login_user() -> tuple[Response, int]:
     data = request.get_json()
 
-    try:
-        token_pair: dataclass.SignedTokenPair = q.login_user(
-            data['login'],
-            data['pwdh'],
-            data['fingerprint']
-        )
+    token_pair: dataclass.SignedTokenPair = q.login_user(
+        data['login'],
+        data['pwdh'],
+        data['fingerprint']
+    )
 
-        response_data: dict = provide_access_token(
-            {
-                'status': 'created',
-                'data': {}
-            },
-            token_pair=token_pair
-        )
+    response_data: dict = provide_access_token(
+        {
+            'status': 'created',
+            'data': {}
+        },
+        token_pair=token_pair
+    )
 
-        response = make_response(
-            jsonify(response_data)
-        )
+    response = make_response(
+        jsonify(response_data)
+    )
 
-        response = provide_refresh_token(
-            response,
-            token_pair=token_pair
-        )
+    response = provide_refresh_token(
+        response,
+        token_pair=token_pair
+    )
 
-        return response, 201
-    
-    except KeyError:
-        return jsonify({
-            'status': 'Error',
-            'details': 'Missing data'
-        }), 400
-    except exc.InvalidLoginData:
-        return jsonify({
-            'status': 'Error',
-            'details': "invalid login or password"
-        }), 404
+    return response, 201
 
 @app.route('/api/auth/logout', methods=['POST'])
 @require_access_token
@@ -119,17 +98,12 @@ def logout_user(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint logs user out of their account and terminates their session
     """
-    try:
-        q.logout_user(token.sessionId)
-        payload, status = {
-            'status': 'Deleted',
-            'details': 'Session successfully terminated'
-        }, 200
-    except exc.SessionNotFound:
-        payload, status = {
-            'Status': 'Gone',
-            'details': 'Session was already terminated or didnt exist in the first place'
-        }, 410
+
+    q.logout_user(token.sessionId)
+    payload = {
+        'status': 'Deleted',
+        'details': 'Session successfully terminated'
+    }
     
     response = make_response(jsonify(payload))
     response.delete_cookie(
@@ -138,7 +112,7 @@ def logout_user(token: dataclass.Token) -> tuple[Response, int]:
         path='/auth/refresh',
     )
 
-    return response, status
+    return response, 200
 
 @app.route('/api/auth/account', methods=['GET'])
 @require_access_token
