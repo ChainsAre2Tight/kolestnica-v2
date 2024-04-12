@@ -10,6 +10,9 @@ class NotPermittedException(BaseException):
 class UserNotFoundException(BaseException):
     """Raised when specified user cannot be found in the database"""
 
+class SessionNotFound(BaseException):
+    """Raised when session with specified uuid cannot be found in the database"""
+
 class RequestAlreadyFullfilledException(BaseException):
     """Raised when requested action is not needed as requirement is already fullfilled"""
 
@@ -18,3 +21,9 @@ class DuplicateLoginException(BaseException):
 
 class DuplicateUsernameException(BaseException):
     """Raised when user attempts to change his username onto an already taken one"""
+
+class InvalidLoginData(BaseException):
+    """Raised when user provides an invalid login/password pair on login"""
+
+class AlreadyLoggedIn(BaseException):
+    """Raised when user tries to log in to different account from the same session"""
