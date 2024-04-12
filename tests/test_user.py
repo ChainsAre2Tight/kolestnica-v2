@@ -18,7 +18,7 @@ class TestAvaliability(unittest.TestCase):
 
     def test_ping(self):
         r = requests.get('http://127.0.0.1:5020/api/auth').status_code
-        self.assertEqual(r, 400)
+        self.assertEqual(r, 401)
     
     def test_bad_token(self):
         global corrupted_token
@@ -26,7 +26,7 @@ class TestAvaliability(unittest.TestCase):
             url='http://127.0.0.1:5020/api/auth',
             headers={'Authorization': corrupted_token}
         ).status_code
-        self.assertEqual(r, 403)
+        self.assertEqual(r, 401)
     
     def test_expired_token(self):
         global expired_token
@@ -34,7 +34,7 @@ class TestAvaliability(unittest.TestCase):
             url='http://127.0.0.1:5020/api/auth',
             headers={'Authorization': expired_token}
         ).status_code
-        self.assertEqual(r, 401)
+        self.assertEqual(r, 403)
     
     def test_good_token(self):
         global token_pointing_to_nonexistant_user

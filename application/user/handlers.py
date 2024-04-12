@@ -6,6 +6,43 @@ import utils.my_dataclasses as dataclass
 import user.queries as q
 import utils.my_exceptions as exc
 
+def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenPair) -> dict:
+    """
+    `Writes` access and expiry fields into data field of provided response dictionary
+
+    :params dict response_data: dictionary containing necessary response data
+    :params SignedTokenPair token_pair: signed token pair dataclass
+    :returns: modified response_data dictionary
+    """
+    try:
+        _ = response_data['data']
+    except KeyError:
+        response_data['data'] = dict()
+    
+    response_data['data']['access'] = token_pair.access
+    response_data['data']['expiry'] = token_pair.access_expiry
+
+    return response_data
+
+def provide_refresh_token(response: Response, token_pair: dataclass.SignedTokenPair) -> Response:
+    """
+    `Adds` a refresh token cookie to response
+
+    :params Response response: Flask Response object
+    :params SignedTokenPair token_pair: signed token pair dataclass
+    :returns: modified Response object
+    """
+    
+    response.set_cookie(
+            key='r',
+            value=token_pair.refresh,
+            httponly=True,
+            path='/auth/refresh',
+            expires=token_pair.refresh_expiry
+        )
+    
+    return Response
+
 @app.route('/api/auth', methods=['GET'])
 @require_access_token
 def ping(_) -> tuple[Response, int]:
@@ -46,23 +83,22 @@ def login_user() -> tuple[Response, int]:
             data['pwdh'],
             data['fingerprint']
         )
-        
-        response = make_response(
-            jsonify({
+
+        response_data: dict = provide_access_token(
+            {
                 'status': 'created',
-                'data': {
-                    'access': token_pair.access,
-                    'expiry': token_pair.access_expiry
-                }
-            })
+                'data': {}
+            },
+            token_pair=token_pair
         )
 
-        response.set_cookie(
-            key='r',
-            value=token_pair.refresh,
-            httponly=True,
-            path='/auth/refresh',
-            expires=token_pair.refresh_expiry
+        response = make_response(
+            jsonify(response_data)
+        )
+
+        response = provide_refresh_token(
+            response,
+            token_pair=token_pair
         )
 
         return response, 201
@@ -130,3 +166,11 @@ def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
             'sessions': dataclass.convert_dataclass_to_dict(sessions)
         }
     }), 200
+
+@app.route('/api/auth/refresh-tokens', methods=['POST'])
+@require_access_token
+def refresh_tokens(token: dataclass.Token) -> tuple[Response, int]:
+    """
+    This endpoint provides user with a refreshed token pair upon request
+    """
+    return '', 501
