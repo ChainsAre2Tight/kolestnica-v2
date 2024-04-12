@@ -13,6 +13,8 @@ class Token:
 class SignedTokenPair:
     access: str
     refresh: str
+    access_expiry: int
+    refresh_expiry: int
 
 class ModelDataclassInterface(ABC):
 
@@ -62,7 +64,7 @@ class Chat(ModelDataclassInterface):
         )
     
     def to_model(self, model) -> object:
-        return super().to_model(model)
+        raise NotImplementedError
 
 @dataclass
 class OtherUser(ModelDataclassInterface):
@@ -81,7 +83,7 @@ class OtherUser(ModelDataclassInterface):
         )
     
     def to_model(self, model) -> object:
-        return super().to_model(model)
+        raise NotImplementedError
 
 class CurrentUser(OtherUser):
     pass
@@ -111,3 +113,20 @@ class Message(ModelDataclassInterface):
             chat_id=self.chat_id,
             author_id=self.author_id
         )
+
+@dataclass
+class Session(ModelDataclassInterface):
+    uuid: str
+    refresh_token: str | None
+    socketId: str | None
+
+    @staticmethod
+    def from_model(model_object) -> object:
+        return Session(
+            uuid=model_object.uuid,
+            refresh_token=model_object.refresh_token,
+            socketId=model_object.socketId
+        )
+    
+    def to_model(self, model) -> object:
+        raise NotImplementedError
