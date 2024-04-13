@@ -143,7 +143,7 @@ def create_chat(token: dataclass.Token) -> tuple[Response, int]:
     data = request.get_json()
 
     # store it into database
-    chat = q.create_chat(sessioId=token.sessionId, chat_name=data['chat_name'])
+    chat = q.create_chat(sessionId=token.sessionId, chat_name=data['chat_name'])
 
     # send request to user server to generate encryption key
     pass # TODO make it)

@@ -4,17 +4,17 @@ import utils.my_dataclasses as dataclass
 import sqlalchemy.exc
 import utils.my_exceptions as exc
 
-def _get_user_by_sessionId(sessionId: str) -> models.User:
-    try:
-        return db.session.query(models.Session).\
-            filter(models.Session.uuid == sessionId).one().user
-    except sqlalchemy.exc.NoResultFound:
+from utils.helpers import get_user_id_by_sessionId
+
+def get_user_by_id(user_id: int) -> models.User:
+    user = db.session.get(models.User, user_id)
+    if user is None:
         raise exc.UserNotExistsException
+    return user
 
-
-def _get_chats_by_session(user: models.User) -> list[models.Chat]:
+def _get_chats_by_session(user_id: int) -> list[models.Chat]:
     result = db.session.query(models.Chat)\
-        .filter(models.Chat.users.any(models.User.id == user.id)).all()
+        .filter(models.Chat.users.any(models.User.id == user_id)).all()
     return result
 
 def _get_users_by_chats(chats: list[models.Chat]) -> list[models.User]:
@@ -24,15 +24,15 @@ def _get_users_by_chats(chats: list[models.Chat]) -> list[models.User]:
         ))
     return users
 
-def _get_messages_by_chat_id_and_user(chat_id: int, user: models.User) -> list[models.Message]:
+def _get_messages_by_chat_id_and_user(chat_id: int, user_id: int) -> list[models.Message]:
     try:
         chat = db.session.query(models.Chat)\
             .filter(
                 models.Chat.id == chat_id,
-                models.Chat.users.any(models.User.id == user.id)
+                models.Chat.users.any(models.User.id == user_id)
             ).one()
     except sqlalchemy.exc.NoResultFound:
-        raise exc.NoAcccessException(f'{user.username} Attempted to access chat №{chat_id}')
+        raise exc.NoAcccessException(f'User #{user_id} Attempted to access chat №{chat_id}')
 
     messages = db.session.query(models.Message).filter(
         models.Message.chat_id == chat.id
@@ -42,8 +42,9 @@ def _get_messages_by_chat_id_and_user(chat_id: int, user: models.User) -> list[m
 def get_chats_by_sessionId(sessionId: str) -> list[dataclass.Chat]:
     return dataclass.convert_model_to_dataclass(
         _get_chats_by_session(
-            _get_user_by_sessionId(
-                sessionId=sessionId
+            get_user_id_by_sessionId(
+                key=sessionId,
+                db=db
             )),
         dataclass.Chat
     )
@@ -52,7 +53,10 @@ def get_users_by_sessionId(sessionId: str) -> list[dataclass.OtherUser]:
     return dataclass.convert_model_to_dataclass(
         _get_users_by_chats(
             _get_chats_by_session(
-                _get_user_by_sessionId(sessionId=sessionId)
+                get_user_id_by_sessionId(
+                    key=sessionId,
+                    db=db
+                )
             )
         ),
         dataclass.OtherUser
@@ -62,7 +66,10 @@ def get_messages_by_chat_id(chat_id: int, sessionId: str) -> list[dataclass.Mess
     return dataclass.convert_model_to_dataclass(
         _get_messages_by_chat_id_and_user(
             chat_id=chat_id,
-            user=_get_user_by_sessionId(sessionId=sessionId)
+            user_id=get_user_id_by_sessionId(
+                key=sessionId,
+                db=db
+            )
         ),
         dataclass.Message
     )
@@ -70,8 +77,11 @@ def get_messages_by_chat_id(chat_id: int, sessionId: str) -> list[dataclass.Mess
 def store_message(sessionId: str, message: dataclass.Message) -> dataclass.Message:
     
     # get user info from database
-    user = _get_user_by_sessionId(sessionId=sessionId)
-    message.author_id = user.id
+    user_id = get_user_id_by_sessionId(
+        key=sessionId,
+        db=db
+    )
+    message.author_id = user_id
 
     # send messsage to database
     model_message: models.Message = message.to_model(model=models.Message)
@@ -86,7 +96,12 @@ def store_message(sessionId: str, message: dataclass.Message) -> dataclass.Messa
 def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, int]:
 
     # get user info from database
-    user = _get_user_by_sessionId(sessionId=sessionId)
+    user_id = get_user_id_by_sessionId(
+        key=sessionId,
+        db=db
+    )
+
+    user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
         raise exc.NoAcccessException
 
@@ -100,7 +115,7 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
         raise exc.NoAcccessException
 
     # verify his authorship
-    if message.author_id != user.id:
+    if message.author_id != user_id:
         raise exc.NotPermittedException
 
     # delete message
@@ -110,10 +125,12 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
 
     return msg_to_delete
 
-def create_chat(sessioId: str, chat_name: str) -> dataclass.Chat:
+def create_chat(sessionId: str, chat_name: str) -> dataclass.Chat:
     
     # get user data
-    user = _get_user_by_sessionId(sessionId=sessioId)
+    user_id = get_user_id_by_sessionId(key=sessionId, db=db)
+
+    user = get_user_by_id(user_id)
 
     # create chat
     chat = models.Chat(
@@ -128,7 +145,11 @@ def create_chat(sessioId: str, chat_name: str) -> dataclass.Chat:
     
 def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.OtherUser]:
     
-    user = _get_user_by_sessionId(sessionId=sessionId)
+    user_id = get_user_id_by_sessionId(
+        key=sessionId,
+        db=db
+    )
+    user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
         raise exc.NoAcccessException
     
@@ -138,7 +159,11 @@ def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.Ot
 
 def add_user_to_chat(sessionId: str, chat_id: int, username: str) -> dataclass.OtherUser:
 
-    user = _get_user_by_sessionId(sessionId=sessionId)
+    user_id = get_user_id_by_sessionId(
+        key=sessionId,
+        db=db
+    )
+    user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
         raise exc.NoAcccessException
     
