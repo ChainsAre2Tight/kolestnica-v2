@@ -9,13 +9,20 @@ class GlobalConfigInterface(ABC):
     json_encryption_strategy: encryption_strategy.EncryptionStrategyInterface
     database_name: str
     cache_strategy: CachingStrategyInterface
-    
+
 
 class TestGlobalConfig(GlobalConfigInterface):
     token_encryption_strategy = encryption_strategy.IdleEncryptionStrategy
     json_encryption_strategy = encryption_strategy.IdleEncryptionStrategy
     database_name = 'koleso2_test'
     cache_strategy = caching_strategy.RedisCacheStrategy
+
+
+# class TestGlobalConfig(GlobalConfigInterface):
+#     token_encryption_strategy = encryption_strategy.ReverseEncryptionStrategy
+#     json_encryption_strategy = encryption_strategy.CaesarEncryptionStrategy
+#     database_name = 'koleso2_test'
+#     cache_strategy = caching_strategy.RedisCacheStrategy
 
 
 class ProductionGlobalConfig(GlobalConfigInterface):
