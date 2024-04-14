@@ -2,6 +2,9 @@ from utils.my_dataclasses import Token, SignedTokenPair
 import jwt
 import datetime
 from database.caching import CacheController
+from typing_extensions import Literal
+import os
+from crypto.token_encryption import TokenEncryptionController
 
 class DefaultTokenConfig:
     algorithm = 'HS256'
@@ -9,7 +12,34 @@ class DefaultTokenConfig:
     access_lifetime = 300
     refresh_lifetime = 1800
 
+TokenPublicKey = os.environ.get('TOKEN-PUBLIC-KEY') or 'secret'
 
+@TokenEncryptionController.decrypt_token('raw_token')
+def decode_token(
+        raw_token: str,
+        algorithm: Literal['HS256', 'RS256'] = 'HS256',
+        verify_expiration: bool = True
+    ) -> Token:
+    """
+    Decodes a token
+
+    :params:
+        str raw_token: string containing JWT token
+        str algorithm: signature algorithm
+        bool verify_expiration: if set to False will skip expiration check
+    
+    :returns dataclass.Token: dataclass Token object containing decoded token data
+    """
+    return Token(
+        **jwt.decode(
+            raw_token,
+            algorithms=[algorithm],
+            options={'verify_exp': verify_expiration},
+            key=TokenPublicKey
+        )
+    )
+
+@TokenEncryptionController.encrypt_token
 def _sign_token(token: Token, config: DefaultTokenConfig) -> str:
     return jwt.encode(
         token.__dict__,
