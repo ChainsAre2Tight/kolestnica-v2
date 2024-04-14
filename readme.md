@@ -1,62 +1,11 @@
-Here be dragons
+Проект мессенджера с программным шифрованием, выполняющийся в рамках курсовой работы
+Архитектура проекта на бэкенде представлеет из себя набор микросервисов, реляционную базу данных (MySQL) и кэш (Redis).
 
-- Routes 80
-    - / - welcome page
-    - /auth
-        - /register
-        - /login
-        - /logout
-    - /app - application page
-    - /api
-        - /auth - auth server 5020
-        - /data - feed server 5010
-            - /chats - returns list of chats by user and their respective encryption keys
-            - /chats/users
-            - /chats/<chat-id>/messages - returns list of messages within a chat
-        - /ws - websocket server 5030
+Особенности проекта:
+- В проекте реализован алгоритм RSA шифрования для защиты содержимого HTTP пакетов;
+- Наличие токенная авторизация с применением токенов доступа и обновления;
+- Каждый микросервис использует особое окружение с разделенными правами на доступ к базе данных;
+- Используются Вебсокеты для отправки оповещений на клиент.
 
-- Models
-    - User
-        - userid
-        - username
-        - alias
-        - date of creation (/)
-        - image_id (href)
-
-        - chats
-        - sessions
-
-    - user_login
-        - userid
-        - login
-        - password
-
-    - session
-        - init date (/)
-        - uuid
-        - socketid
-        - refresh_token
-
-    - chat
-        - id
-        - name
-        - image (href)
-        
-        - users
-        - messages
-
-    - chat_encryption
-        - id
-        - key
-
-    - message
-        - id
-        - body
-        - timestamp
-
-        - author
-
-
-- Token
-    - sessionId
-    - exp
+Обзор бэкенда:
+![Backend overview](https://github.com/ChainsAre2Tight/kolestnica-v2/blob/main/description/%D0%BA%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B8%D1%86%D0%B02.png)
