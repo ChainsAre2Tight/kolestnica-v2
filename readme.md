@@ -9,3 +9,6 @@
 
 Обзор бэкенда:
 ![Backend overview](https://github.com/ChainsAre2Tight/kolestnica-v2/blob/main/description/%D0%BA%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B8%D1%86%D0%B02.png)
+
+Generic DFD envelope
+![Generic DFD](https://github.com/ChainsAre2Tight/kolestnica-v2/blob/main/description/%D0%BA%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B8%D1%86%D0%B02_2.png)
