@@ -1,6 +1,7 @@
 from utils.my_dataclasses import Token, SignedTokenPair
 import jwt
 import datetime
+from database.caching import CacheController
 
 class DefaultTokenConfig:
     algorithm = 'HS256'
@@ -16,6 +17,7 @@ def _sign_token(token: Token, config: DefaultTokenConfig) -> str:
         algorithm=config.algorithm
     )
 
+@CacheController.remove_from_cache('sessionId')
 def create_token_pair(sessionId: str, config: DefaultTokenConfig) -> SignedTokenPair:
     timestamp = int(datetime.datetime.now().timestamp())
     acc_exp = timestamp + config.access_lifetime

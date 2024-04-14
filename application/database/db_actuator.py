@@ -1,5 +1,6 @@
 from flask import Flask
 import models as m
+import redis
 
 def prepare_test_environment(dbname: str = 'koleso2_test') -> None:
 
@@ -7,6 +8,9 @@ def prepare_test_environment(dbname: str = 'koleso2_test') -> None:
     app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:root@localhost:3306/{dbname}"
     db = m.db
     db.init_app(app)
+
+    r = redis.Redis()
+    r.flushdb()
 
     with app.app_context():
 

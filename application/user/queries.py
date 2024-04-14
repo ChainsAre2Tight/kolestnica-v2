@@ -63,7 +63,7 @@ def _create_session(user: models.User, sessionId: str) -> models.Session:
     Attempts to create a session for specified user with provided fingerprint
 
     :params models.User user: user for whom to create session
-    :params str sessionId: unique fingerprint of user's browser
+    :params str sessionId: fingerprint of current session, accesible via provided JWT
     :returns: SQLAlchemy Session models object
 
     :raises AlreadyLoggedIn: if user has already logged in to a different account from the same device
@@ -89,7 +89,7 @@ def _terminate_sesion(sessionId: str) -> None:
     """
     Attempts to terminate a session associated with provided token data
 
-    :param str sessionId: unique session indentifier
+    :params str sessionId: fingerprint of current session, accesible via provided JWT
 
     :raises SessionNotFound: if session with provided data cannot be found
     """
@@ -154,11 +154,18 @@ def logout_user(sessionId: str) -> None:
     """
     Attempts to log out user by deleting the session associated with him
 
+    :params str sessionId: fingerprint of current session, accesible via provided JWT
     :raises SessionNotFound: if session was already terminated before
     """
     _terminate_sesion(sessionId=sessionId)
 
 def list_active_sessions(sessionId: str) -> list[dataclass.Session]:
+    """
+    Returns a list of all active sessions assosiated with current user from database
+
+    :params str sessionId: fingerprint of current session, accesible via provided JWT
+    :raises UserNotExists: if there is no session accosiated with this client
+    """
     try:
         user = db.session.query(models.Session).\
             filter(models.Session.uuid == sessionId).one().user

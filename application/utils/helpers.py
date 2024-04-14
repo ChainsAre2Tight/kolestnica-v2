@@ -2,9 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 import database.models as models
 import sqlalchemy.exc
 import utils.my_exceptions as exc
-from database.caching import read_through_cache
+from database.caching import CacheController
 
-@read_through_cache
+@CacheController.read_through_cache('key')
 def get_user_id_by_sessionId(
         key: str,
         db: SQLAlchemy,
