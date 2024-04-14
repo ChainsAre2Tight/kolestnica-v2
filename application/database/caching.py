@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from functools import wraps
 from typing import Callable
+from utils.wrapper_checks import check_for_keyword_in_kwargs
 
 import redis
 
@@ -111,7 +112,7 @@ class CacheController:
 
             @wraps(func)
             def decorated_function(*args, **kwargs):
-                assert keyword in kwargs.keys(), f'Keyword "{keyword}" is missing in kwargs of {func.__name__}'
+                check_for_keyword_in_kwargs(kwargs, keyword, func.__name__)
                 key = kwargs[keyword]
 
                 try:
@@ -138,7 +139,7 @@ class CacheController:
         
             @wraps(func)
             def decorated_function(*args, **kwargs):
-                assert keyword in kwargs.keys(), f'Keyword "{keyword}" is missing in kwargs of {func.__name__}'
+                check_for_keyword_in_kwargs(kwargs, keyword, func.__name__)
                 key = kwargs[keyword]
 
                 cls.cache_strategy.delete_from_cache(key)
