@@ -2,29 +2,43 @@
 
 import jwt
 import datetime
-from typing_extensions import Literal
 import os
 
 from utils.my_dataclasses import Token, SignedTokenPair
 from cache.cache_controller import CacheController
 from crypto.token_encryption import TokenEncryptionController
 
-class DefaultTokenConfig:
+
+# import relevant config
+Environment = os.environ.get('ENVIRONMENT') or 'TEST'
+if Environment == 'TEST':
+    from project_config import TestGlobalConfig as GlobalConfig
+elif Environment == 'PRODUCTION':
+    from project_config import ProductionGlobalConfig as GlobalConfig
+
+
+class _DefaultTokenConfig:
     algorithm = 'HS256'
     secret_key = 'secret'
     access_lifetime = 300
     refresh_lifetime = 1800
 
-TokenPublicKey = os.environ.get('TOKEN-PUBLIC-KEY') or 'secret'
+
+class _CurrentTokenConfig(_DefaultTokenConfig):
+    algorithm = GlobalConfig.token_sign_algorithm
+    private_key = os.environ.get('TOKEN-SECRET-KEY') or 'very-secret-token-private-key'\
+        if not GlobalConfig.overwrite_token_signature_key\
+            else GlobalConfig.overwrite_token_signature_key
+    public_key = os.environ.get('TOKEN-PUBLIC-KEY') or 'not-so-secret-token-public-key'\
+        if not GlobalConfig.overwrite_token_verification_key\
+            else GlobalConfig.overwrite_token_verification_key
+    access_lifetime = GlobalConfig.access_token_lifetime
+    refresh_lifetime = GlobalConfig.refresh_token_lifetime
+
 
 @TokenEncryptionController.decrypt_token('raw_token')
-def decode_token(
-        raw_token: str,
-        algorithm: Literal['HS256', 'RS256'] = 'HS256',
-        verify_expiration: bool = True
-    ) -> Token:
-    """
-    Decodes a token
+def decode_token(raw_token: str) -> Token:
+    """Decodes a token
 
     :params:
         str raw_token: string containing JWT token
@@ -36,25 +50,32 @@ def decode_token(
     return Token(
         **jwt.decode(
             raw_token,
-            algorithms=[algorithm],
-            options={'verify_exp': verify_expiration},
-            key=TokenPublicKey
+            algorithms=[_CurrentTokenConfig.algorithm],
+            key=_CurrentTokenConfig.public_key
         )
     )
 
 @TokenEncryptionController.encrypt_token
-def _sign_token(token: Token, config: DefaultTokenConfig) -> str:
+def _sign_token(token: Token) -> str:
     return jwt.encode(
         token.__dict__,
-        key=config.secret_key,
-        algorithm=config.algorithm
+        key=_CurrentTokenConfig.secret_key,
+        algorithm=_CurrentTokenConfig.algorithm
     )
 
 @CacheController.remove_from_cache('sessionId')
-def create_token_pair(sessionId: str, config: DefaultTokenConfig) -> SignedTokenPair:
+def create_token_pair(sessionId: str) -> SignedTokenPair:
+    """Geneartes and signs a poken pair for requesting user
+
+    Args:
+        sessionId (str): unique session fingerprint
+
+    Returns:
+        SignedTokenPair: dataclass containing tokens and their expiration time
+    """
     timestamp = int(datetime.datetime.now().timestamp())
-    acc_exp = timestamp + config.access_lifetime
-    ref_exp = timestamp + config.refresh_lifetime
+    acc_exp = timestamp + _CurrentTokenConfig.access_lifetime
+    ref_exp = timestamp + _CurrentTokenConfig.refresh_lifetime
 
     access = Token(
         sessionId=sessionId,
@@ -69,8 +90,8 @@ def create_token_pair(sessionId: str, config: DefaultTokenConfig) -> SignedToken
     )
 
     return SignedTokenPair(
-        access=_sign_token(access, config),
-        refresh=_sign_token(refresh, config),
+        access=_sign_token(access),
+        refresh=_sign_token(refresh),
         access_expiry=acc_exp,
         refresh_expiry=ref_exp
     )

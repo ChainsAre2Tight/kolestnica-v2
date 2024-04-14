@@ -24,10 +24,7 @@ def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
     def decorated_function(*args, **kwargs):
         try:
             raw_token: str = dict(request.headers)['Authorization']
-            token: Token = decode_token(
-                raw_token=raw_token,
-                algorithm='HS256',
-            )
+            token: Token = decode_token(raw_token=raw_token)
         
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
             return jsonify({
@@ -60,10 +57,7 @@ def require_refresh_token(func: Callable | None=None) -> tuple[Response, int] | 
 
         try:
             raw_token: str = request.cookies['r']
-            decoded_token: Token = decode_token(
-                raw_token=raw_token,
-                algorithm='HS256'
-            )
+            decoded_token: Token = decode_token(raw_token=raw_token)
         
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
             return jsonify({

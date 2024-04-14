@@ -143,10 +143,7 @@ def login_user(login: str, pwdh: str, uuid: str) -> dataclass.SignedTokenPair:
         )
 
     # create and sign a token pair for this session
-    token_pair = tokens.create_token_pair(
-        sessionId=session.uuid,
-        config=tokens.DefaultTokenConfig
-    )
+    token_pair = tokens.create_token_pair(sessionId=session.uuid)
 
     return token_pair
 
@@ -199,10 +196,7 @@ def refresh_tokens(
     except sqlalchemy.exc.NoResultFound:
         raise exc.DeprecatedRefreshToken
     
-    new_token_pair = tokens.create_token_pair(
-        sessionId=refresh.sessionId,
-        config=tokens.DefaultTokenConfig
-    )
+    new_token_pair = tokens.create_token_pair(sessionId=refresh.sessionId)
 
     session.refresh_token = new_token_pair.refresh
     db.session.commit()
