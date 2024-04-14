@@ -2,8 +2,8 @@
 from functools import wraps
 from typing import Callable
 from utils.wrapper_checks import check_for_keyword_in_kwargs
-from database.cache_strategy import CacheMiss
-from database.cache_interface import CachingStrategyInterface
+from utils.my_exceptions import CacheMiss
+from cache.cache_interface import CachingStrategyInterface
 
 import os
 

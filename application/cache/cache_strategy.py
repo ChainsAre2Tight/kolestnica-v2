@@ -1,9 +1,6 @@
-from database.cache_interface import CachingStrategyInterface
+from cache.cache_interface import CachingStrategyInterface
+from utils.my_exceptions import CacheMiss
 import redis
-
-class CacheMiss(BaseException):
-    """Raised when requested key does not exist in key"""
-
 
 class DictCacheStrategy(CachingStrategyInterface):
     

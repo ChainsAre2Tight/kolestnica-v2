@@ -1,7 +1,7 @@
 from abc import ABC
 import crypto.encryption_strategies as encryption_strategy
-import database.cache_strategy as caching_strategy
-from database.cache_interface import CachingStrategyInterface
+import cache.cache_strategy as caching_strategy
+from cache.cache_interface import CachingStrategyInterface
 
 
 class GlobalConfigInterface(ABC):

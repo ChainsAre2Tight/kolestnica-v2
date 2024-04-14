@@ -3,7 +3,7 @@ from feed.app import app, db
 import utils.my_dataclasses as dataclass
 import sqlalchemy.exc
 import utils.my_exceptions as exc
-from database.cache_controller import CacheController
+from cache.cache_controller import CacheController
 
 
 @CacheController.read_through_cache('sessionId', int)
