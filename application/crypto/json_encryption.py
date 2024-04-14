@@ -24,13 +24,14 @@ class JSONEncryptionControllerInterface(ABC):
 
 
 class JSONEncryptionController(JSONEncryptionControllerInterface):    
-    _encryption_strategy = GlobalConfig.json_encryption_strategy()
+    _encryption_strategy = GlobalConfig.json_encryption_strategy
     
     @classmethod
     def encrypt_json(cls, provide_data: bool = False) -> Callable:
         def wrapper(func):
             @wraps(func)
             def decorated_function(*args, **kwargs):
+                
                 # if there is no need to decrypt payload, skip decryption
                 if provide_data:
                     
