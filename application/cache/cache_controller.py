@@ -1,11 +1,13 @@
+"""This module provides a controller that oversees caching"""
 
 from functools import wraps
 from typing import Callable
+import os
+
 from utils.wrapper_checks import check_for_keyword_in_kwargs
 from utils.exc import CacheMiss
 from cache.cache_interface import CachingStrategyInterface
 
-import os
 
 # import relevant config
 Environment = os.environ.get('ENVIRONMENT') or 'TEST'

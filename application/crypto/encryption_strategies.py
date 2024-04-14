@@ -1,8 +1,18 @@
+"""Module containing encryption stretegies
+
+Alivable strategies:
+- Idle
+- Reverse
+- Caesar cipher
+- RSA (TBA)
+"""
+
 from abc import ABC, abstractmethod
 from utils.exc import BadEncryptionKeys
 
 
 class EncryptionStrategyInterface(ABC):
+    """Interface for encryption strategies"""
     key_format: type
 
     @staticmethod
@@ -52,7 +62,9 @@ class EncryptionStrategyInterface(ABC):
             object: key of required type
         """
 
+
 class IdleEncryptionStrategy(EncryptionStrategyInterface):
+    """Performs no encryption"""
     key_format = None
     
     @staticmethod
@@ -67,7 +79,9 @@ class IdleEncryptionStrategy(EncryptionStrategyInterface):
     def format_key(cls, key: str) -> object:
         return None
 
+
 class ReverseEncryptionStrategy(EncryptionStrategyInterface):
+    """Reverses given messages"""
     key_format = None
 
     @staticmethod
@@ -82,7 +96,15 @@ class ReverseEncryptionStrategy(EncryptionStrategyInterface):
     def format_key(cls, key: str) -> object:
         return None
 
+
 class CaesarEncryptionStrategy(EncryptionStrategyInterface):
+    """Is essaentialy a Caesar cipher
+    
+    - Shifts ord() of given charactes by amount specified in key
+    - Shifts integers by key
+    
+    Key format: Integer
+    """
     key_format = int
 
     @staticmethod

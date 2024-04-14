@@ -1,3 +1,5 @@
+"""This module contains wrappers for Flask request handlers"""
+
 from functools import wraps, partial
 from typing import Callable
 from flask import request, jsonify
@@ -5,8 +7,8 @@ import jwt
 import json
 import utils.exc as exc
 from flask import Response, make_response
-from user.tokens import decode_token
 
+from user.tokens import decode_token
 from utils.my_dataclasses import Token
 
 def require_access_token(func: Callable) -> tuple[Response, int] | Callable:

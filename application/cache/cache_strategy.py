@@ -1,8 +1,18 @@
-from cache.cache_interface import CachingStrategyInterface
-from utils.exc import CacheMiss
+"""This module provides caching strategies
+
+Alivable strategies:
+- DictCache: uses Python dictionary
+- RedisCache: uses a Redis instance
+"""
+
 import redis
 
+from cache.cache_interface import CachingStrategyInterface
+from utils.exc import CacheMiss
+
+
 class DictCacheStrategy(CachingStrategyInterface):
+    """Uses a Python dictionary as its storage"""
     
     def __init__(self):
         self.data = dict()
@@ -23,7 +33,9 @@ class DictCacheStrategy(CachingStrategyInterface):
         except KeyError:
             pass # ignore
 
+
 class RedisCacheStrategy(CachingStrategyInterface):
+    """Uses a Redis instance as its storage"""
     debug = True
 
     def __init__(self):

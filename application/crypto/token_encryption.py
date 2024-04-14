@@ -1,8 +1,10 @@
-from abc import ABC, abstractmethod
-from crypto.encryption_strategies import *
-from functools import wraps
-from utils.wrapper_checks import check_for_keyword_in_kwargs
+"""This module provides a controller that oversees token encryption"""
+
 import os
+from functools import wraps
+
+from crypto.encryption_strategies import *
+from utils.wrapper_checks import check_for_keyword_in_kwargs
 
 # import relevant config
 Environment = os.environ.get('ENVIRONMENT') or 'TEST'
@@ -12,21 +14,7 @@ elif Environment == 'PRODUCTION':
     from project_config import ProductionGlobalConfig as GlobalConfig
 
 
-class TokenEncryptionControllerInterface(ABC):
-    EncryptionStrategy: EncryptionStrategyInterface
-
-    @classmethod
-    @abstractmethod
-    def encrypt_token(cls):
-        pass
-
-    @classmethod
-    @abstractmethod
-    def decrypt_token(cls):
-        pass
-
-
-class TokenEncryptionController(TokenEncryptionControllerInterface):
+class TokenEncryptionController():
     EncryptionStrategy = GlobalConfig.token_encryption_strategy()
 
     @classmethod

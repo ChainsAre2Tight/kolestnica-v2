@@ -1,3 +1,5 @@
+"""This module provides global configs that determine strategies used in the project"""
+
 from abc import ABC
 import crypto.encryption_strategies as encryption_strategy
 import cache.cache_strategy as caching_strategy

@@ -1,9 +1,12 @@
-from utils.my_dataclasses import Token, SignedTokenPair
+"""This module provides functions and decorators used to create and read tokens"""
+
 import jwt
 import datetime
-from cache.cache_controller import CacheController
 from typing_extensions import Literal
 import os
+
+from utils.my_dataclasses import Token, SignedTokenPair
+from cache.cache_controller import CacheController
 from crypto.token_encryption import TokenEncryptionController
 
 class DefaultTokenConfig:

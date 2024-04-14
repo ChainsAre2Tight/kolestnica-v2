@@ -1,10 +1,13 @@
-from crypto.encryption_strategies import *
-from functools import wraps
-from typing_extensions import Callable
+"""This module contains controller that oversees JSON encryption"""
+
 from flask import request, Response
-import json
+from functools import wraps
 from abc import ABC, abstractmethod
+from typing_extensions import Callable
+import json
 import os
+
+from crypto.encryption_strategies import *
 from utils.exc import BadEncryptionKeys
 
 # import relevant config
@@ -21,7 +24,16 @@ class JSONEncryptionControllerInterface(ABC):
     @classmethod
     @abstractmethod
     def encrypt_json(cls, provide_data: bool = False) -> Callable:
-        pass
+        """A decorator that will encrypt and decrypt json of decorated requests
+
+        Args:
+            provide_data (bool, optional): If set to True will provide "data" attribute\
+        to decorated functions containing decrypted JSON data. Defaults to False.
+
+        Raises:
+            BadEncryptionKeys: If header containing keys is missing or keys are in wrong format
+            NotImplementedError: If JSON contains data that cannot be encrypted
+        """
 
 
 class JSONEncryptionController(JSONEncryptionControllerInterface):    
@@ -134,6 +146,6 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
         elif type(iterable) is int or str or float:
             result = action(iterable, key)
         else:
-            raise NotImplementedError(f'Unexpected type {type(iterable)}')
+            raise NotImplementedError(f'Cannot encrypt/decrypt objects of type "{type(iterable)}"')
         return result
     
