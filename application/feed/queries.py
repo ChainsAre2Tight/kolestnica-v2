@@ -3,8 +3,16 @@ from feed.app import app, db
 import utils.my_dataclasses as dataclass
 import sqlalchemy.exc
 import utils.my_exceptions as exc
+from database.cache_controller import CacheController
 
-from utils.helpers import get_user_id_by_sessionId
+
+@CacheController.read_through_cache('sessionId')
+def get_user_id_by_sessionId(sessionId: str) -> int:
+    try:
+        return db.session.query(models.Session).\
+            filter(models.Session.uuid == sessionId).one().user_id
+    except sqlalchemy.exc.NoResultFound:
+        raise exc.UserNotExistsException
 
 def get_user_by_id(user_id: int) -> models.User:
     user = db.session.get(models.User, user_id)
@@ -42,10 +50,7 @@ def _get_messages_by_chat_id_and_user(chat_id: int, user_id: int) -> list[models
 def get_chats_by_sessionId(sessionId: str) -> list[dataclass.Chat]:
     return dataclass.convert_model_to_dataclass(
         _get_chats_by_session(
-            get_user_id_by_sessionId(
-                key=sessionId,
-                db=db
-            )),
+            get_user_id_by_sessionId(sessionId=sessionId)),
         dataclass.Chat
     )
 
@@ -53,10 +58,7 @@ def get_users_by_sessionId(sessionId: str) -> list[dataclass.OtherUser]:
     return dataclass.convert_model_to_dataclass(
         _get_users_by_chats(
             _get_chats_by_session(
-                get_user_id_by_sessionId(
-                    key=sessionId,
-                    db=db
-                )
+                get_user_id_by_sessionId(sessionId=sessionId)
             )
         ),
         dataclass.OtherUser
@@ -66,10 +68,7 @@ def get_messages_by_chat_id(chat_id: int, sessionId: str) -> list[dataclass.Mess
     return dataclass.convert_model_to_dataclass(
         _get_messages_by_chat_id_and_user(
             chat_id=chat_id,
-            user_id=get_user_id_by_sessionId(
-                key=sessionId,
-                db=db
-            )
+            user_id=get_user_id_by_sessionId(sessionId=sessionId)
         ),
         dataclass.Message
     )
@@ -77,10 +76,8 @@ def get_messages_by_chat_id(chat_id: int, sessionId: str) -> list[dataclass.Mess
 def store_message(sessionId: str, message: dataclass.Message) -> dataclass.Message:
     
     # get user info from database
-    user_id = get_user_id_by_sessionId(
-        key=sessionId,
-        db=db
-    )
+    user_id = get_user_id_by_sessionId(sessionId=sessionId)
+
     message.author_id = user_id
 
     # send messsage to database
@@ -96,10 +93,7 @@ def store_message(sessionId: str, message: dataclass.Message) -> dataclass.Messa
 def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, int]:
 
     # get user info from database
-    user_id = get_user_id_by_sessionId(
-        key=sessionId,
-        db=db
-    )
+    user_id = get_user_id_by_sessionId(sessionId=sessionId)
 
     user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
@@ -128,7 +122,7 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
 def create_chat(sessionId: str, chat_name: str) -> dataclass.Chat:
     
     # get user data
-    user_id = get_user_id_by_sessionId(key=sessionId, db=db)
+    user_id = get_user_id_by_sessionId(sessionId=sessionId)
 
     user = get_user_by_id(user_id)
 
@@ -145,10 +139,8 @@ def create_chat(sessionId: str, chat_name: str) -> dataclass.Chat:
     
 def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.OtherUser]:
     
-    user_id = get_user_id_by_sessionId(
-        key=sessionId,
-        db=db
-    )
+    user_id = get_user_id_by_sessionId(sessionId=sessionId)
+
     user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
         raise exc.NoAcccessException
@@ -159,10 +151,8 @@ def get_users_of_certain_chat(sessionId: str, chat_id: int) -> list[dataclass.Ot
 
 def add_user_to_chat(sessionId: str, chat_id: int, username: str) -> dataclass.OtherUser:
 
-    user_id = get_user_id_by_sessionId(
-        key=sessionId,
-        db=db
-    )
+    user_id = get_user_id_by_sessionId(sessionId=sessionId)
+
     user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
         raise exc.NoAcccessException

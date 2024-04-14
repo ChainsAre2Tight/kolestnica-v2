@@ -1,6 +1,6 @@
-from flask import jsonify, request, make_response, Response
+from flask import jsonify, request, Response
 
-from utils.wrappers import require_access_token, handle_http_exceptions
+from utils.http_wrappers import require_access_token, handle_http_exceptions
 import utils.my_dataclasses as dataclass
 from feed.app import app
 import feed.queries as q

@@ -1,3 +1,6 @@
+class WrappedFunctionMissingKeyword(BaseException):
+    """Raised when wrapped function is missing certain keyword"""
+
 class HTTPException(BaseException):
     """A base class for exceptions that invoke an HTTP error response"""
 

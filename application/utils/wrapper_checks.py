@@ -1,7 +1,4 @@
-from typing_extensions import Callable
-
-class WrappedFunctionMissingKeyword(BaseException):
-    """Raised when wrapped function is missing certain keyword"""
+from utils.my_exceptions import WrappedFunctionMissingKeyword
 
 def check_for_keyword_in_kwargs(kwargs: dict, keyword: str, func_name: str) -> None:
     if not keyword in kwargs.keys():

@@ -1,7 +1,7 @@
-from flask import request, Response, make_response, jsonify
+from flask import Response, make_response, jsonify
 
 from user.app import app
-from utils.wrappers import require_access_token, handle_http_exceptions, require_refresh_token
+from utils.http_wrappers import require_access_token, handle_http_exceptions, require_refresh_token
 import utils.my_dataclasses as dataclass
 import user.queries as q
 from crypto.json_encryption import JSONEncryptionController
