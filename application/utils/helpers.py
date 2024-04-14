@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 import database.models as models
 import sqlalchemy.exc
 import utils.my_exceptions as exc
-from database.caching import CacheController
+from database.cache_controller import CacheController
 
 @CacheController.read_through_cache('key')
 def get_user_id_by_sessionId(

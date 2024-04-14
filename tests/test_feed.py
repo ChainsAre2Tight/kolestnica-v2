@@ -8,6 +8,8 @@ if __name__ == "__main__":
     sys.path.append('../application/database')
     from db_actuator import prepare_test_environment
 
+    sys.path.append('../application')
+
 
 class TestAvaliability(unittest.TestCase):
 
@@ -401,7 +403,7 @@ if __name__ == "__main__":
 
     # reset database
     dbname = 'koleso2_test'
-    prepare_test_environment(dbname)
+    prepare_test_environment()
 
     # run tests
     runner.run(suite(__name__))

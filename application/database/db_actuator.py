@@ -1,11 +1,27 @@
 from flask import Flask
 import models as m
 import redis
+import os
 
-def prepare_test_environment(dbname: str = 'koleso2_test') -> None:
+try:
+    import project_config as _
+except ModuleNotFoundError:
+    import sys
+    sys.path.append('../application')
+
+    import project_config as _
+
+# import relevant config
+Environment = os.environ.get('ENVIRONMENT') or 'TEST'
+if Environment == 'TEST':
+    from project_config import TestGlobalConfig as GlobalConfig
+elif Environment == 'PRODUCTION':
+    from project_config import ProductionGlobalConfig as GlobalConfig
+
+def prepare_test_environment() -> None:
 
     app = Flask('db-actuator')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:root@localhost:3306/{dbname}"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:root@localhost:3306/{GlobalConfig.database_name}"
     db = m.db
     db.init_app(app)
 

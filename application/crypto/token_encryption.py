@@ -2,6 +2,14 @@ from abc import ABC, abstractmethod
 from crypto.encryption_strategies import *
 from functools import wraps
 from utils.wrapper_checks import check_for_keyword_in_kwargs
+import os
+
+# import relevant config
+Environment = os.environ.get('ENVIRONMENT') or 'TEST'
+if Environment == 'TEST':
+    from project_config import TestGlobalConfig as GlobalConfig
+elif Environment == 'PRODUCTION':
+    from project_config import ProductionGlobalConfig as GlobalConfig
 
 
 class TokenEncryptionControllerInterface(ABC):
@@ -19,7 +27,7 @@ class TokenEncryptionControllerInterface(ABC):
 
 
 class TokenEncryptionController(TokenEncryptionControllerInterface):
-    EncryptionStrategy = IdleEncryptionStrategy()
+    EncryptionStrategy = GlobalConfig.token_encryption_strategy()
 
     @classmethod
     def encrypt_token(cls, func):

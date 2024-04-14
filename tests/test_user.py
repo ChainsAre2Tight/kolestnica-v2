@@ -301,7 +301,7 @@ if __name__ == "__main__":
 
     # reset database
     dbname = 'koleso2_test'
-    prepare_test_environment(dbname)
+    prepare_test_environment()
 
     # run tests
     runner.run(suite(__name__))

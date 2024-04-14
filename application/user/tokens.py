@@ -1,7 +1,7 @@
 from utils.my_dataclasses import Token, SignedTokenPair
 import jwt
 import datetime
-from database.caching import CacheController
+from database.cache_controller import CacheController
 from typing_extensions import Literal
 import os
 from crypto.token_encryption import TokenEncryptionController
