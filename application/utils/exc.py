@@ -39,3 +39,6 @@ class AlreadyLoggedIn(HTTPException):
 
 class DeprecatedRefreshToken(HTTPException):
     """Raised when user tries to refresh token pair with an old or invalid refresh token"""
+
+class MissingEncryptionKeys(HTTPException):
+    """Raised when client didnt provide encryption keys upon request that are requered by current encryption policy"""

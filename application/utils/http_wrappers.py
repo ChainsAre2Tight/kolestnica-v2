@@ -135,5 +135,7 @@ def handle_http_exceptions(
             return make_err_response('Invalid login or password', e), 404
         except exc.SessionNotFound as e:
             return make_err_response('Session was already terminated or didnt exist in the first place', e), 410
+        except exc.MissingEncryptionKeys as e:
+            return make_err_response('Missing encryption keys'), 401
     
     return decorated_function
