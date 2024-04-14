@@ -6,7 +6,7 @@ import utils.my_exceptions as exc
 from database.cache_controller import CacheController
 
 
-@CacheController.read_through_cache('sessionId')
+@CacheController.read_through_cache('sessionId', int)
 def get_user_id_by_sessionId(sessionId: str) -> int:
     try:
         return db.session.query(models.Session).\
@@ -97,7 +97,7 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
 
     user = get_user_by_id(user_id)
     if chat_id not in [chat.id for chat in user.chats]:
-        raise exc.NoAcccessException
+        raise exc.NoAcccessException('no chat')
 
     # get message info from database
     try:
@@ -106,11 +106,11 @@ def delete_message(sessionId: str, chat_id: int, message_id: int) -> dict[str, i
             models.Message.chat_id == chat_id
         ).one()
     except sqlalchemy.exc.NoResultFound:
-        raise exc.NoAcccessException
+        raise exc.NoAcccessException('no message')
 
     # verify his authorship
     if message.author_id != user_id:
-        raise exc.NotPermittedException
+        raise exc.NotPermittedException('not author')
 
     # delete message
     msg_to_delete = {'chat_id': message.chat_id, 'msg_id': message.id}

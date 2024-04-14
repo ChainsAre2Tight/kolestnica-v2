@@ -3,6 +3,7 @@ from functools import wraps
 from typing import Callable
 from utils.wrapper_checks import check_for_keyword_in_kwargs
 from database.cache_strategy import CacheMiss
+from database.cache_interface import CachingStrategyInterface
 
 import os
 
@@ -15,14 +16,15 @@ elif Environment == 'PRODUCTION':
         
 
 class CacheController:
-    cache_strategy = GlobalConfig.cache_strategy()
+    cache_strategy: CachingStrategyInterface = GlobalConfig.cache_strategy()
 
     @classmethod
-    def read_through_cache(cls, keyword) -> Callable:
+    def read_through_cache(cls, keyword: str, type_: type) -> Callable:
         """
         Provides an interface to read and write data into cache while reading data within nested function
         
         :params str keyword: key of KWARGS
+        :params type type_: what object type is expected to be recieved
         """
         def wrapper(func) -> Callable:
 
@@ -32,15 +34,15 @@ class CacheController:
                 key = kwargs[keyword]
 
                 try:
-                    return cls.cache_strategy.find_in_cache(key)
+                    result = cls.cache_strategy.find_in_cache(key)
                 except CacheMiss:
                     value = func(*args, **kwargs)
                     cls.cache_strategy.write_into_cache(
                         key=key,
                         value=value
                     )
-                    return value
-            
+                    result = value
+                return type_(result)
             return decorated_function
         return wrapper
         
