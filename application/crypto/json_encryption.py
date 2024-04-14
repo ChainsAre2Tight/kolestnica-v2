@@ -5,6 +5,7 @@ from flask import request, Response
 import json
 from abc import ABC, abstractmethod
 import os
+from utils.exc import BadEncryptionKeys
 
 # import relevant config
 Environment = os.environ.get('ENVIRONMENT') or 'TEST'
@@ -31,25 +32,41 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
         def wrapper(func):
             @wraps(func)
             def decorated_function(*args, **kwargs):
+                key: None | int | str | tuple[int, int] = None
                 
-                # if there is no need to decrypt payload, skip decryption
+                # if encryption requires key, check if being provided in request headers
+                if cls._encryption_strategy.key_format is not None:
+                    try:
+                        raw_key = request.headers['enc-key']
+                        key = cls._encryption_strategy.format_key(raw_key)
+                        print('key is', key)
+                    except KeyError:
+                        raise BadEncryptionKeys('Encryption key is missing')
+                    
+                # decrypt payload only if its contents are necessary
                 if provide_data:
                     
                     # decrypt json payload
                     encrypted_request_data = request.get_json()
-                    decrypted_request_data = cls._decrypt_dict(encrypted_request_data)
+                    decrypted_request_data = cls._decrypt_dict(
+                        dictionary=encrypted_request_data,
+                        decryption_key=key
+                    )
 
                     kwargs['data'] = decrypted_request_data
                 
-                # perform handler function
+                # execute decorated function
                 response: Response
                 status_code: int
 
                 response, status_code = func(*args, **kwargs)
 
-                # ecnrypt json payload
+                # encrypt json payload
                 data = response.get_json()
-                encrypted_response_data = cls._encrypt_dict(data)
+                encrypted_response_data = cls._encrypt_dict(
+                    dictionary=data,
+                    encryption_key=key
+                )
                 response.data = json.dumps(encrypted_response_data)
 
                 return response, status_code
@@ -58,54 +75,65 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
         return wrapper
     
     @classmethod
-    def _encrypt_dict(cls, dictionary: dict | list) -> dict | list:
+    def _encrypt_dict(
+            cls,
+            dictionary: dict | list,
+            encryption_key: None | int | str | tuple[int, int]
+        ) -> dict | list:
+        
         return cls._recursively_perform_action(
             iterable=dictionary,
-            action=cls._encryption_strategy.encrypt_message
+            action=cls._encryption_strategy.encrypt_message,
+            key=encryption_key
         )
     
     @classmethod
-    def _decrypt_dict(cls, dictionary: dict | list) -> dict | list:
+    def _decrypt_dict(
+            cls,
+            dictionary: dict | list,
+            decryption_key: None | int | str | tuple[int, int]
+        ) -> dict | list:
+        
         return cls._recursively_perform_action(
             iterable=dictionary,
-            action=cls._encryption_strategy.decrypt_message
+            action=cls._encryption_strategy.decrypt_message,
+            key=decryption_key
         )
 
     @classmethod
     def _recursively_perform_action(
             cls,
             iterable: dict | list | str | int,
-            action: Callable
+            action: Callable,
+            key: None | str | int | tuple[int, int]
         ) -> dict | list | str:
         
-
         # if object is a dictionary, iterate through keys and values
         if type(iterable) is dict:
             result = {
-                action(key): cls._recursively_perform_action(
-                    iterable=value,
-                    action=action
-                )
-                for key, value in iterable.items()
+                action(old_key, key): cls._recursively_perform_action(
+                        iterable=value,
+                        action=action,
+                        key=key
+                    )
+                for old_key, value in iterable.items()
             }
-
-            for old_key, old_value in iterable.items():
-                new_key = action(old_key)
-                
-                new_value = action(old_value)
-                
-                result[new_key] = new_value
         
+        # if object is a list, iterate through values
         elif type(iterable) is list:
             result = [
                 cls._recursively_perform_action(
                     iterable=item,
-                    action=action
+                    action=action,
+                    key=key
                 )
                 for item in iterable
             ]
-        else:
-            result = action(iterable)
         
+        # if object is not iterable, perform the required action against it
+        elif type(iterable) is int or str or float:
+            result = action(iterable, key)
+        else:
+            raise NotImplementedError(f'Unexpected type {type(iterable)}')
         return result
     
