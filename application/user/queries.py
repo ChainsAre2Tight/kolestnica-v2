@@ -1,6 +1,6 @@
 import sqlalchemy.exc
 
-import utils.my_exceptions as exc
+import utils.exc as exc
 import utils.my_dataclasses as dataclass
 import database.models as models
 from user.app import db

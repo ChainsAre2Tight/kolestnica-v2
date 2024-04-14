@@ -1,5 +1,5 @@
 from cache.cache_interface import CachingStrategyInterface
-from utils.my_exceptions import CacheMiss
+from utils.exc import CacheMiss
 import redis
 
 class DictCacheStrategy(CachingStrategyInterface):

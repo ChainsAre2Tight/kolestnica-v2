@@ -2,7 +2,7 @@ import database.models as models
 from feed.app import app, db
 import utils.my_dataclasses as dataclass
 import sqlalchemy.exc
-import utils.my_exceptions as exc
+import utils.exc as exc
 from cache.cache_controller import CacheController
 
 

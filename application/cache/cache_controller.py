@@ -2,7 +2,7 @@
 from functools import wraps
 from typing import Callable
 from utils.wrapper_checks import check_for_keyword_in_kwargs
-from utils.my_exceptions import CacheMiss
+from utils.exc import CacheMiss
 from cache.cache_interface import CachingStrategyInterface
 
 import os

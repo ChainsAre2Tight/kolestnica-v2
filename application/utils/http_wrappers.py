@@ -3,7 +3,7 @@ from typing import Callable
 from flask import request, jsonify
 import jwt
 import json
-import utils.my_exceptions as exc
+import utils.exc as exc
 from flask import Response, make_response
 from user.tokens import decode_token
 
