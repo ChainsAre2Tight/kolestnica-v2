@@ -30,3 +30,31 @@ class CachingStrategyInterface(ABC):
 
         :params str key: key that indentifies data in cache
         """
+
+class CacheControllerInterface(ABC):
+    """Provides an interface for cache controller"""
+
+    _cache_strategy: CachingStrategyInterface
+
+    @abstractmethod
+    def read_through_cache(self, keyword: str, type_: type):
+        """Provides an interface to read and write data into cache while \
+            reading data within nested function
+
+        Args:
+            keyword (str): key of KWARGS
+            type_ (type): what object type is expected to be recieved
+        """
+
+    @abstractmethod
+    def remove_from_cache(self, keyword: str):
+        """Removes old data from cache
+
+        Args:
+            keyword (str): key of KWARGS
+        """
+
+    @staticmethod
+    @abstractmethod
+    def build():
+        """Builds an instance of CacheController with current environment settings"""
