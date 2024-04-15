@@ -5,8 +5,6 @@ Alivable strategies:
 - RedisCache: uses a Redis instance
 """
 
-import redis
-
 from cache.cache_interface import CachingStrategyInterface
 from utils.exc import CacheMiss
 
@@ -38,8 +36,8 @@ class RedisCacheStrategy(CachingStrategyInterface):
     """Uses a Redis instance as its storage"""
     debug = True
 
-    def __init__(self):
-        self.r = redis.Redis(decode_responses=True)
+    def __init__(self, redis_):
+        self.r = redis_
         
         if self.debug:
             print(f'---> Redis is alivable ({self.r.ping()})')

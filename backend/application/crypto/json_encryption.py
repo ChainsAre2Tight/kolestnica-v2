@@ -5,8 +5,9 @@ from functools import wraps
 from abc import ABC, abstractmethod
 from typing_extensions import Callable
 import json
+import os
 
-from crypto.encryption_strategies import EncryptionStrategyInterface
+from crypto.encryption_strategies import *
 from utils.exc import BadEncryptionKeys
 
 
@@ -25,12 +26,32 @@ class JSONEncryptionControllerInterface(ABC):
             BadEncryptionKeys: If header containing keys is missing or keys are in wrong format
             NotImplementedError: If JSON contains data that cannot be encrypted
         """
+    
+    @staticmethod
+    @abstractmethod
+    def build():
+        """Build a JSON encryption controller based on current environment
+
+        Returns:
+            JSONEncryptionController: controller instance
+        """
 
 
 class JSONEncryptionController(JSONEncryptionControllerInterface):
     
     def __init__(self, strategy: EncryptionStrategyInterface) -> None:
         self._encryption_strategy = strategy
+    
+    @staticmethod
+    def build():
+        match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+            case 'REVERSE':
+                encryption = ReverseEncryptionStrategy
+            case 'CAESAR':
+                encryption = CaesarEncryptionStrategy
+            case _:
+                encryption = IdleEncryptionStrategy
+        return JSONEncryptionController(strategy=encryption)
     
     def encrypt_json(self, provide_data: bool = False) -> Callable:
         def wrapper(func):

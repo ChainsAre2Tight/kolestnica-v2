@@ -6,19 +6,8 @@ from utils.http_wrappers import require_access_token, handle_http_exceptions, re
 import utils.my_dataclasses as dataclass
 import user.queries as q
 from crypto.json_encryption import JSONEncryptionController
-import crypto.encryption_strategies as enc_strat
 
-match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
-    case 'IDLE':
-        encryption = enc_strat.IdleEncryptionStrategy
-    case 'REVERSE':
-        encryption = enc_strat.ReverseEncryptionStrategy
-    case 'CAESAR':
-        encryption = enc_strat.CaesarEncryptionStrategy
-    case _:
-        encryption = enc_strat.IdleEncryptionStrategy
-
-json_controller = JSONEncryptionController(strategy=encryption)
+json_controller = JSONEncryptionController.build()
 
 def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenPair) -> dict:
     """

@@ -1,5 +1,4 @@
 from flask import jsonify, request, Response
-import os
 
 from utils.http_wrappers import require_access_token, handle_http_exceptions
 import utils.my_dataclasses as dataclass
@@ -7,19 +6,7 @@ from feed.app import app
 import feed.queries as q
 from crypto.json_encryption import JSONEncryptionController
 
-import crypto.encryption_strategies as enc_strat
-
-match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
-    case 'IDLE':
-        encryption = enc_strat.IdleEncryptionStrategy
-    case 'REVERSE':
-        encryption = enc_strat.ReverseEncryptionStrategy
-    case 'CAESAR':
-        encryption = enc_strat.CaesarEncryptionStrategy
-    case _:
-        encryption = enc_strat.IdleEncryptionStrategy
-
-json_controller = JSONEncryptionController(strategy=encryption)
+json_controller = JSONEncryptionController.build()
 
 @app.route('/api/data', methods=['GET'])
 @require_access_token

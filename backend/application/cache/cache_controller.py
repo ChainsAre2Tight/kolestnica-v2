@@ -7,23 +7,17 @@ import os
 from utils.wrapper_checks import check_for_keyword_in_kwargs
 from utils.exc import CacheMiss
 from cache.cache_interface import CachingStrategyInterface
+from cache.cache_strategy import *
 
-
-# import relevant config
-Environment = os.environ.get('ENVIRONMENT') or 'TEST'
-if Environment == 'TEST':
-    from project_config import TestGlobalConfig as GlobalConfig
-elif Environment == 'PRODUCTION':
-    from project_config import ProductionGlobalConfig as GlobalConfig
-        
 
 class CacheController:
-    cache_strategy: CachingStrategyInterface = GlobalConfig.cache_strategy()
+    cache_strategy: CachingStrategyInterface
+    
+    def __init__(self, strategy: CachingStrategyInterface):
+        self.cache_strategy = strategy
 
-    @classmethod
-    def read_through_cache(cls, keyword: str, type_: type) -> Callable:
-        """
-        Provides an interface to read and write data into cache while reading data within nested function
+    def read_through_cache(self, keyword: str, type_: type) -> Callable:
+        """Provides an interface to read and write data into cache while reading data within nested function
         
         :params str keyword: key of KWARGS
         :params type type_: what object type is expected to be recieved
@@ -36,10 +30,10 @@ class CacheController:
                 key = kwargs[keyword]
 
                 try:
-                    result = cls.cache_strategy.find_in_cache(key)
+                    result = self.cache_strategy.find_in_cache(key)
                 except CacheMiss:
                     value = func(*args, **kwargs)
-                    cls.cache_strategy.write_into_cache(
+                    self.cache_strategy.write_into_cache(
                         key=key,
                         value=value
                     )
@@ -48,10 +42,8 @@ class CacheController:
             return decorated_function
         return wrapper
         
-    @classmethod
-    def remove_from_cache(cls, keyword):
-        """
-        Removes old data from cache
+    def remove_from_cache(self, keyword):
+        """Removes old data from cache
 
         :params str keyword: key of KWARGS
         """
@@ -62,10 +54,31 @@ class CacheController:
                 check_for_keyword_in_kwargs(kwargs, keyword, func.__name__)
                 key = kwargs[keyword]
 
-                cls.cache_strategy.delete_from_cache(key)
+                self.cache_strategy.delete_from_cache(key)
             
                 return func(*args, **kwargs)
         
             return decorated_function
         return wrapper
-    
+
+    @staticmethod
+    def build():
+        match os.environ.get('CACHE_STRATEGY'):
+            case 'REDIS':
+                import redis
+                
+                redis_url = os.environ.get('REDIS_HOST')
+                redis_port = int(os.environ.get('REDIS_PORT') or 6379)
+                redis_db = int(os.environ.get('REDIS_SESSION_DB') or 0)
+                
+                cache_strategy = RedisCacheStrategy(
+                    redis_ = redis.Redis(
+                        host=redis_url,
+                        port=redis_port,
+                        decode_responses=True,
+                        db=redis_db
+                    )
+                )
+            case _:
+                cache_strategy = DictCacheStrategy()
+        return CacheController(cache_strategy)

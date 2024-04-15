@@ -8,6 +8,7 @@ from utils.my_dataclasses import Token, SignedTokenPair
 from cache.cache_controller import CacheController
 from crypto.token_encryption import TokenEncryptionController
 import crypto.encryption_strategies as enc_strat
+import cache.cache_strategy as cache_strat
 
 
 class _TokenConfig:
@@ -18,19 +19,7 @@ class _TokenConfig:
     refresh_lifetime = int(os.environ.get('REFRESH_LIFETIME') or 1800)
 
 
-match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
-    case 'IDLE':
-        encryption = enc_strat.IdleEncryptionStrategy
-    case 'REVERSE':
-        encryption = enc_strat.ReverseEncryptionStrategy
-    case 'CAESAR':
-        encryption = enc_strat.CaesarEncryptionStrategy
-    case _:
-        encryption = enc_strat.IdleEncryptionStrategy
-
-token_encryption = TokenEncryptionController(
-    encryption=encryption
-)
+token_encryption = TokenEncryptionController.build()
 
 
 @token_encryption.decrypt_token('raw_token')

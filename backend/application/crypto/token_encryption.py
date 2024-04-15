@@ -6,6 +6,7 @@ from functools import wraps
 from crypto.encryption_strategies import *
 from utils.wrapper_checks import check_for_keyword_in_kwargs
 
+
 class TokenEncryptionController():
     _strategy: EncryptionStrategyInterface
     _key: str
@@ -16,7 +17,6 @@ class TokenEncryptionController():
 
     def encrypt_token(self, func):
         """Encrypts the token string with a symmetric cryptoalgorithm"""
-
         @wraps(func)
         def decorated_function(*args, **kwargs):
             token: str = func(*args, **kwargs)
@@ -29,7 +29,6 @@ class TokenEncryptionController():
         
         :params str keyword: Key of KWARGS by which to look for token
         """
-
         def wrapper(func):
             @wraps(func)
             def decorated_function(*args, **kwargs):
@@ -46,3 +45,17 @@ class TokenEncryptionController():
             return decorated_function
         return wrapper
     
+    def build():
+        """Build a token encryption controller based on current environment
+
+        Returns:
+            _type_: A token encryption controller instance
+        """
+        match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+            case 'REVERSE':
+                encryption = ReverseEncryptionStrategy
+            case 'CAESAR':
+                encryption = CaesarEncryptionStrategy
+            case _:
+                encryption = IdleEncryptionStrategy
+        return TokenEncryptionController(encryption)

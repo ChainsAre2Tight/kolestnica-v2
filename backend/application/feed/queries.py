@@ -5,8 +5,9 @@ import sqlalchemy.exc
 import utils.exc as exc
 from cache.cache_controller import CacheController
 
+cache_controller = CacheController.build()
 
-@CacheController.read_through_cache('sessionId', int)
+@cache_controller.read_through_cache('sessionId', int)
 def get_user_id_by_sessionId(sessionId: str) -> int:
     try:
         return db.session.query(models.Session).\
