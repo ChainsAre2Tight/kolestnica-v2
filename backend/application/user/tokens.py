@@ -7,36 +7,33 @@ import os
 from utils.my_dataclasses import Token, SignedTokenPair
 from cache.cache_controller import CacheController
 from crypto.token_encryption import TokenEncryptionController
+import crypto.encryption_strategies as enc_strat
 
 
-# import relevant config
-Environment = os.environ.get('ENVIRONMENT') or 'TEST'
-if Environment == 'TEST':
-    from project_config import TestGlobalConfig as GlobalConfig
-elif Environment == 'PRODUCTION':
-    from project_config import ProductionGlobalConfig as GlobalConfig
+class _TokenConfig:
+    algorithm = os.environ.get('TOKEN_SIGNATURE_ALG')
+    public_key = os.environ.get('TOKEN_PUBLIC_KEY')
+    secret_key = os.environ.get('TOKEN_SECRET_KEY')
+    access_lifetime = int(os.environ.get('ACCESS_LIFETIME') or 300)
+    refresh_lifetime = int(os.environ.get('REFRESH_LIFETIME') or 1800)
 
 
-class _DefaultTokenConfig:
-    algorithm = 'HS256'
-    secret_key = 'secret'
-    access_lifetime = 300
-    refresh_lifetime = 1800
+match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+    case 'IDLE':
+        encryption = enc_strat.IdleEncryptionStrategy
+    case 'REVERSE':
+        encryption = enc_strat.ReverseEncryptionStrategy
+    case 'CAESAR':
+        encryption = enc_strat.CaesarEncryptionStrategy
+    case _:
+        encryption = enc_strat.IdleEncryptionStrategy
+
+token_encryption = TokenEncryptionController(
+    encryption=encryption
+)
 
 
-class _CurrentTokenConfig(_DefaultTokenConfig):
-    algorithm = GlobalConfig.token_sign_algorithm
-    private_key = os.environ.get('TOKEN-SECRET-KEY') or 'very-secret-token-private-key'\
-        if not GlobalConfig.overwrite_token_signature_key\
-            else GlobalConfig.overwrite_token_signature_key
-    public_key = os.environ.get('TOKEN-PUBLIC-KEY') or 'not-so-secret-token-public-key'\
-        if not GlobalConfig.overwrite_token_verification_key\
-            else GlobalConfig.overwrite_token_verification_key
-    access_lifetime = GlobalConfig.access_token_lifetime
-    refresh_lifetime = GlobalConfig.refresh_token_lifetime
-
-
-@TokenEncryptionController.decrypt_token('raw_token')
+@token_encryption.decrypt_token('raw_token')
 def decode_token(raw_token: str) -> Token:
     """Decodes a token
 
@@ -50,17 +47,17 @@ def decode_token(raw_token: str) -> Token:
     return Token(
         **jwt.decode(
             raw_token,
-            algorithms=[_CurrentTokenConfig.algorithm],
-            key=_CurrentTokenConfig.public_key
+            algorithms=[_TokenConfig.algorithm],
+            key=_TokenConfig.public_key
         )
     )
 
-@TokenEncryptionController.encrypt_token
+@token_encryption.encrypt_token
 def _sign_token(token: Token) -> str:
     return jwt.encode(
         token.__dict__,
-        key=_CurrentTokenConfig.secret_key,
-        algorithm=_CurrentTokenConfig.algorithm
+        key=_TokenConfig.secret_key,
+        algorithm=_TokenConfig.algorithm
     )
 
 @CacheController.remove_from_cache('sessionId')
@@ -74,8 +71,8 @@ def create_token_pair(sessionId: str) -> SignedTokenPair:
         SignedTokenPair: dataclass containing tokens and their expiration time
     """
     timestamp = int(datetime.datetime.now().timestamp())
-    acc_exp = timestamp + _CurrentTokenConfig.access_lifetime
-    ref_exp = timestamp + _CurrentTokenConfig.refresh_lifetime
+    acc_exp = timestamp + _TokenConfig.access_lifetime
+    ref_exp = timestamp + _TokenConfig.refresh_lifetime
 
     access = Token(
         sessionId=sessionId,

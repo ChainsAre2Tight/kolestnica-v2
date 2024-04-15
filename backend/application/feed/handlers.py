@@ -1,10 +1,25 @@
 from flask import jsonify, request, Response
+import os
 
 from utils.http_wrappers import require_access_token, handle_http_exceptions
 import utils.my_dataclasses as dataclass
 from feed.app import app
 import feed.queries as q
 from crypto.json_encryption import JSONEncryptionController
+
+import crypto.encryption_strategies as enc_strat
+
+match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+    case 'IDLE':
+        encryption = enc_strat.IdleEncryptionStrategy
+    case 'REVERSE':
+        encryption = enc_strat.ReverseEncryptionStrategy
+    case 'CAESAR':
+        encryption = enc_strat.CaesarEncryptionStrategy
+    case _:
+        encryption = enc_strat.IdleEncryptionStrategy
+
+json_controller = JSONEncryptionController(strategy=encryption)
 
 @app.route('/api/data', methods=['GET'])
 @require_access_token
@@ -16,7 +31,7 @@ def ping(_) -> tuple[Response, int]:
 @app.route('/api/data/chats', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def get_chats(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a way to get all chats\
@@ -31,7 +46,7 @@ def get_chats(token: dataclass.Token) -> tuple[Response, int]:
 @app.route('/api/data/users', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def get_users(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a way to get info of users\
@@ -46,7 +61,7 @@ def get_users(token: dataclass.Token) -> tuple[Response, int]:
 @app.route('/api/data/chats/<int:c_id>/users', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to yield all users of a certain chat if user has access to it
@@ -59,7 +74,7 @@ def get_users_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]
 @app.route('/api/data/chats/<int:c_id>/users', methods=['POST'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json(provide_data=True)
+@json_controller.encrypt_json(provide_data=True)
 def add_user_to_chat(token: dataclass.Token, c_id: int, data: dict) -> tuple[Response, int]:
     """
     This endpoint lets user add other users to the chat
@@ -76,7 +91,7 @@ def add_user_to_chat(token: dataclass.Token, c_id: int, data: dict) -> tuple[Res
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def get_messages_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to get all mesages \
@@ -91,7 +106,7 @@ def get_messages_by_chat(token: dataclass.Token, c_id: int) -> tuple[Response, i
 @app.route('/api/data/chats/<int:c_id>/messages', methods=['POST'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json(provide_data=True)
+@json_controller.encrypt_json(provide_data=True)
 def send_message(token: dataclass.Token, c_id: int, data: dict) -> tuple[Response, int]:
     """
     This endpoint serves to provide a way to send new messages\
@@ -122,7 +137,7 @@ def send_message(token: dataclass.Token, c_id: int, data: dict) -> tuple[Respons
 @app.route('/api/data/chats/<int:c_id>/messages/<int:m_id>', methods=['DELETE'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def delete_message(token: dataclass.Token, c_id: int, m_id: int) -> tuple[Response, int]:
     """
     This endpoint provides a way to delete message by its author
@@ -139,7 +154,7 @@ def delete_message(token: dataclass.Token, c_id: int, m_id: int) -> tuple[Respon
 @app.route('/api/data/chats', methods=['POST'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def create_chat(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint provides a mean to create a new chat

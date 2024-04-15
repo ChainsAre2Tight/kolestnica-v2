@@ -1,10 +1,24 @@
 from flask import Response, make_response, jsonify
+import os
 
 from user.app import app
 from utils.http_wrappers import require_access_token, handle_http_exceptions, require_refresh_token
 import utils.my_dataclasses as dataclass
 import user.queries as q
 from crypto.json_encryption import JSONEncryptionController
+import crypto.encryption_strategies as enc_strat
+
+match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+    case 'IDLE':
+        encryption = enc_strat.IdleEncryptionStrategy
+    case 'REVERSE':
+        encryption = enc_strat.ReverseEncryptionStrategy
+    case 'CAESAR':
+        encryption = enc_strat.CaesarEncryptionStrategy
+    case _:
+        encryption = enc_strat.IdleEncryptionStrategy
+
+json_controller = JSONEncryptionController(strategy=encryption)
 
 def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenPair) -> dict:
     """
@@ -51,7 +65,7 @@ def ping(_) -> tuple[Response, int]:
 
 @app.route('/api/auth/register', methods=['POST'])
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json(provide_data=True)
+@json_controller.encrypt_json(provide_data=True)
 def register_user(data: dict) -> tuple[Response, int]:
 
     _ = q.create_user(
@@ -64,7 +78,7 @@ def register_user(data: dict) -> tuple[Response, int]:
 
 @app.route('/api/auth/login', methods=['POST'])
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json(provide_data=True)
+@json_controller.encrypt_json(provide_data=True)
 def login_user(data: dict) -> tuple[Response, int]:
 
     token_pair: dataclass.SignedTokenPair = q.login_user(
@@ -118,7 +132,7 @@ def logout_user(token: dataclass.Token) -> tuple[Response, int]:
 @app.route('/api/auth/account', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def view_account_data(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint returns all alivable personal data for the requesting account
@@ -129,7 +143,7 @@ def view_account_data(token: dataclass.Token) -> tuple[Response, int]:
 @app.route('/api/auth/account/sessions', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
     """
     This endpoint lists all active sessions of the requesting account
@@ -145,7 +159,7 @@ def view_sessions(token: dataclass.Token) -> tuple[Response, int]:
 @app.route('/api/auth/refresh-tokens', methods=['POST'])
 @require_refresh_token
 @handle_http_exceptions
-@JSONEncryptionController.encrypt_json()
+@json_controller.encrypt_json()
 def refresh_tokens(
         raw_token: str,
         refresh_token: dataclass.Token,

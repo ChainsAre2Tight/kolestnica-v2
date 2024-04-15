@@ -4,13 +4,6 @@ import os
 
 app = Flask('User server')
 
-# import relevant config
-Environment = os.environ.get('ENVIRONMENT') or 'TEST'
-if Environment == 'TEST':
-    from project_config import TestGlobalConfig as GlobalConfig
-elif Environment == 'PRODUCTION':
-    from project_config import ProductionGlobalConfig as GlobalConfig
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SECRET_KEY'] = os.environ.get('FLASK-SECRET-KEY') or 'secret'
 

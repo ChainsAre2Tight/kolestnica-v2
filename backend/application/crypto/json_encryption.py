@@ -5,25 +5,16 @@ from functools import wraps
 from abc import ABC, abstractmethod
 from typing_extensions import Callable
 import json
-import os
 
-from crypto.encryption_strategies import *
+from crypto.encryption_strategies import EncryptionStrategyInterface
 from utils.exc import BadEncryptionKeys
-
-# import relevant config
-Environment = os.environ.get('ENVIRONMENT') or 'TEST'
-if Environment == 'TEST':
-    from project_config import TestGlobalConfig as GlobalConfig
-elif Environment == 'PRODUCTION':
-    from project_config import ProductionGlobalConfig as GlobalConfig
 
 
 class JSONEncryptionControllerInterface(ABC):
     _encryption_strategy: EncryptionStrategyInterface
 
-    @classmethod
     @abstractmethod
-    def encrypt_json(cls, provide_data: bool = False) -> Callable:
+    def encrypt_json(self, provide_data: bool = False) -> Callable:
         """A decorator that will encrypt and decrypt json of decorated requests
 
         Args:
@@ -36,21 +27,22 @@ class JSONEncryptionControllerInterface(ABC):
         """
 
 
-class JSONEncryptionController(JSONEncryptionControllerInterface):    
-    _encryption_strategy = GlobalConfig.json_encryption_strategy
+class JSONEncryptionController(JSONEncryptionControllerInterface):
     
-    @classmethod
-    def encrypt_json(cls, provide_data: bool = False) -> Callable:
+    def __init__(self, strategy: EncryptionStrategyInterface) -> None:
+        self._encryption_strategy = strategy
+    
+    def encrypt_json(self, provide_data: bool = False) -> Callable:
         def wrapper(func):
             @wraps(func)
             def decorated_function(*args, **kwargs):
                 key: None | int | str | tuple[int, int] = None
                 
                 # if encryption requires key, check if being provided in request headers
-                if cls._encryption_strategy.key_format is not None:
+                if self._encryption_strategy.key_format is not None:
                     try:
                         raw_key = request.headers['enc-key']
-                        key = cls._encryption_strategy.format_key(raw_key)
+                        key = self._encryption_strategy.format_key(raw_key)
                         print('key is', key)
                     except KeyError:
                         raise BadEncryptionKeys('Encryption key is missing')
@@ -60,7 +52,7 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
                     
                     # decrypt json payload
                     encrypted_request_data = request.get_json()
-                    decrypted_request_data = cls._decrypt_dict(
+                    decrypted_request_data = self._decrypt_dict(
                         dictionary=encrypted_request_data,
                         decryption_key=key
                     )
@@ -75,7 +67,7 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
 
                 # encrypt json payload
                 data = response.get_json()
-                encrypted_response_data = cls._encrypt_dict(
+                encrypted_response_data = self._encrypt_dict(
                     dictionary=data,
                     encryption_key=key
                 )
@@ -86,29 +78,27 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
             return decorated_function
         return wrapper
     
-    @classmethod
     def _encrypt_dict(
-            cls,
+            self,
             dictionary: dict | list,
             encryption_key: None | int | str | tuple[int, int]
         ) -> dict | list:
         
-        return cls._recursively_perform_action(
+        return self._recursively_perform_action(
             iterable=dictionary,
-            action=cls._encryption_strategy.encrypt_message,
+            action=self._encryption_strategy.encrypt_message,
             key=encryption_key
         )
     
-    @classmethod
     def _decrypt_dict(
-            cls,
+            self,
             dictionary: dict | list,
             decryption_key: None | int | str | tuple[int, int]
         ) -> dict | list:
         
-        return cls._recursively_perform_action(
+        return self._recursively_perform_action(
             iterable=dictionary,
-            action=cls._encryption_strategy.decrypt_message,
+            action=self._encryption_strategy.decrypt_message,
             key=decryption_key
         )
 
