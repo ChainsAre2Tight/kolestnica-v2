@@ -18,6 +18,8 @@ services:
       - ./backend/application/:/usr/src/app/application
     expose:
       - 5020
+    environment:
+      - DB_PORT=3307
     env_file:
       - ./services/user/.env.dev
     depends_on:
@@ -32,6 +34,8 @@ services:
       - ./backend/application/:/usr/src/app/application
     expose:
       - 5010
+    environment:
+      - DB_PORT=3307
     env_file:
       - ./services/feed/.env.dev
     depends_on:
@@ -44,6 +48,8 @@ services:
     command: python manage.py seed_db
     volumes:
       - ./backend/application/:/usr/src/app/application
+    environment:
+      - DB_PORT=3307
     env_file:
       - ./services/database-manager/.env.dev
     depends_on:
@@ -55,6 +61,8 @@ services:
     restart: always
     expose:
       - 3307
+    environment:
+      - MYSQL_TCP_PORT=3307
     env_file:
       - ./services/mysql/.env.dev
     healthcheck:
