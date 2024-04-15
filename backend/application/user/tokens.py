@@ -7,8 +7,6 @@ import os
 from utils.my_dataclasses import Token, SignedTokenPair
 from cache.cache_controller import CacheController
 from crypto.token_encryption import TokenEncryptionController
-import crypto.encryption_strategies as enc_strat
-import cache.cache_strategy as cache_strat
 
 
 class _TokenConfig:
@@ -20,6 +18,7 @@ class _TokenConfig:
 
 
 token_encryption = TokenEncryptionController.build()
+cache_controller = CacheController.build()
 
 
 @token_encryption.decrypt_token('raw_token')
@@ -49,7 +48,7 @@ def _sign_token(token: Token) -> str:
         algorithm=_TokenConfig.algorithm
     )
 
-@CacheController.remove_from_cache('sessionId')
+@cache_controller.remove_from_cache('sessionId')
 def create_token_pair(sessionId: str) -> SignedTokenPair:
     """Geneartes and signs a poken pair for requesting user
 
