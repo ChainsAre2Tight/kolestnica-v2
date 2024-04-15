@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    build: ./services/nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - auth
+      - feed
+    
+  auth:
+    build: ./services/user
+    command: gunicorn --bind 0.0.0.0:5020 manage:app # gunicorn
+    # command: python manage.py run -h 0.0.0.0 -p 5020 # flask
+    volumes:
+      - ./backend/application/:/usr/src/app/application
+    expose:
+      - 5020
+    env_file:
+      - ./services/user/.env.dev
+    depends_on:
+      - db-manager
+      - db
+  
+  feed:
+    build: ./services/feed
+    command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
+    # command: python manage.py run -h 0.0.0.0 -p 5010 # flask
+    volumes:
+      - ./backend/application/:/usr/src/app/application
+    expose:
+      - 5010
+    env_file:
+      - ./services/feed/.env.dev
+    depends_on:
+      - db-manager
+      - db
+      - auth
+  
+  db-manager:
+    build: ./services/database-manager
+    command: python manage.py seed_db
+    volumes:
+      - ./backend/application/:/usr/src/app/application
+    env_file:
+      - ./services/database-manager/.env.dev
+    depends_on:
+      db:
+        condition: service_healthy
+  
+  db:
+    image: mysql:8
+    restart: always
+    expose:
+      - 3307
+    env_file:
+      - ./services/mysql/.env.dev
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 5
+      interval: 5s
+    volumes:
+      - ./dbdata:/var/lib/mysql/

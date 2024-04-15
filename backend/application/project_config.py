@@ -27,7 +27,7 @@ class TestGlobalConfig(GlobalConfigInterface):
     
     token_encryption_strategy = encryption_strategy.IdleEncryptionStrategy
     json_encryption_strategy = encryption_strategy.IdleEncryptionStrategy
-    cache_strategy = caching_strategy.RedisCacheStrategy
+    cache_strategy = caching_strategy.DictCacheStrategy
     
     token_sign_algorithm = 'HS256'
     overwrite_token_verification_key = 'secret'

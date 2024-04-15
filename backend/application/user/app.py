@@ -11,7 +11,7 @@ if Environment == 'TEST':
 elif Environment == 'PRODUCTION':
     from project_config import ProductionGlobalConfig as GlobalConfig
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://root:root@localhost:3306/{GlobalConfig.database_name}"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SECRET_KEY'] = os.environ.get('FLASK-SECRET-KEY') or 'secret'
 
 app.config['SQLALCHEMY_ECHO'] = False
