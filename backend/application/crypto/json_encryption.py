@@ -44,7 +44,7 @@ class JSONEncryptionController(JSONEncryptionControllerInterface):
     
     @staticmethod
     def build():
-        match os.environ.get('TOKEN_ENCRYPTION_STRATEGY'):
+        match os.environ.get('JSON_ENCRYPTION_STRATEGY'):
             case 'REVERSE':
                 encryption = ReverseEncryptionStrategy
             case 'CAESAR':
