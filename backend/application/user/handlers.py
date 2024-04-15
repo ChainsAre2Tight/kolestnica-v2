@@ -44,6 +44,7 @@ def provide_refresh_token(response: Response, token_pair: dataclass.SignedTokenP
     
     return response
 
+
 @app.route('/api/auth', methods=['GET'])
 @require_access_token
 @handle_http_exceptions
@@ -52,11 +53,11 @@ def ping(_) -> tuple[Response, int]:
 
     return jsonify('pinged'), 200
 
+
 @app.route('/api/auth/register', methods=['POST'])
 @handle_http_exceptions
 @json_controller.encrypt_json(provide_data=True)
 def register_user(data: dict) -> tuple[Response, int]:
-
     _ = q.create_user(
         data['username'],
         data['login'],

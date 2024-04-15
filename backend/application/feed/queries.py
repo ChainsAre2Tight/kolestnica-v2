@@ -10,10 +10,10 @@ cache_controller = CacheController.build()
 @cache_controller.read_through_cache('sessionId', int)
 def get_user_id_by_sessionId(sessionId: str) -> int:
     try:
-        return db.session.query(models.Session).\
-            filter(models.Session.uuid == sessionId).one().user_id
+        user_id = db.session.query(models.Session).filter(models.Session.uuid == sessionId).one().user_id
     except sqlalchemy.exc.NoResultFound:
         raise exc.UserNotExistsException
+    return user_id
 
 def get_user_by_id(user_id: int) -> models.User:
     user = db.session.get(models.User, user_id)
