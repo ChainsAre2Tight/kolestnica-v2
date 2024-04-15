@@ -70,13 +70,15 @@ class CacheController:
                 redis_url = os.environ.get('REDIS_HOST')
                 redis_port = int(os.environ.get('REDIS_PORT') or 6379)
                 redis_db = int(os.environ.get('REDIS_SESSION_DB') or 0)
+                # redis_pwd = os.environ.get('REDIS_PASSWORD')
                 
                 cache_strategy = RedisCacheStrategy(
                     redis_ = redis.Redis(
                         host=redis_url,
                         port=redis_port,
                         decode_responses=True,
-                        db=redis_db
+                        db=redis_db,
+                        # password=redis_pwd
                     )
                 )
             case _:
