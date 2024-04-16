@@ -11,7 +11,6 @@ from flask import Response, make_response, request, jsonify
 from libraries.utils import exc
 from libraries.utils.my_dataclasses import Token
 
-
 def decode_token(raw_token: str) -> Token:
     return Token(**jwt.decode(
         jwt=raw_token,
