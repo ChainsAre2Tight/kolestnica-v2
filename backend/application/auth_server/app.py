@@ -1,6 +1,11 @@
-from flask import Flask
-from database.models import db
+
 import os
+
+from flask import Flask
+
+from database.models import db
+from crypto.json_encryption import JSONEncryptionController
+
 
 app = Flask('User server')
 
@@ -15,5 +20,7 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK-SECRET-KEY') or 'secret'
 
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+json_encryptor = JSONEncryptionController.build()
 
 db.init_app(app)

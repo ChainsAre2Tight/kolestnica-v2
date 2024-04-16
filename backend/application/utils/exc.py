@@ -33,6 +33,10 @@ class SessionNotFound(HTTPException):
     """Raised when session with specified uuid cannot be found in the database"""
 
 
+class UserNotFound(HTTPException):
+    """Raised when user with specified data cannot be found in the database"""
+
+
 class RequestAlreadyFullfilledException(HTTPException):
     """Raised when requested action is not needed as requirement is already fullfilled"""
 

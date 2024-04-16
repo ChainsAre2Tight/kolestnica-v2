@@ -116,16 +116,18 @@ class Message(ModelDataclassInterface):
 
 @dataclass
 class Session(ModelDataclassInterface):
+    id: int
     uuid: str
     refresh_token: str | None
-    socketId: str | None
+    socket_id: str | None
 
     @staticmethod
     def from_model(model_object) -> object:
         return Session(
+            id=model_object.id,
             uuid=model_object.uuid,
             refresh_token=model_object.refresh_token,
-            socketId=model_object.socketId
+            socket_id=model_object.socketId
         )
     
     def to_model(self, model) -> object:
