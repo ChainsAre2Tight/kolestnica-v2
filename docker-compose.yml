@@ -8,14 +8,14 @@ services:
       - 1337:80
     depends_on:
       - auth
-      - feed
+      # - feed
     
   auth:
     build: ./services/user
     # command: gunicorn --bind 0.0.0.0:5020 manage:app # gunicorn
     command: python manage.py run -h 0.0.0.0 -p 5020 # flask
     volumes:
-      - ./backend/application/:/usr/src/app/application
+      - ./backend/:/usr/src/app/application
     expose:
       - 5020
     environment:
@@ -26,28 +26,28 @@ services:
       - db-manager
       - db
   
-  feed:
-    build: ./services/feed
-    # command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
-    command: python manage.py run -h 0.0.0.0 -p 5010 # flask
-    volumes:
-      - ./backend/application/:/usr/src/app/application
-    expose:
-      - 5010
-    environment:
-      - DB_PORT=3307
-    env_file:
-      - ./services/feed/.env.dev
-    depends_on:
-      - db-manager
-      - db
-      - auth
+  # feed:
+  #   build: ./services/feed
+  #   # command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
+  #   command: python manage.py run -h 0.0.0.0 -p 5010 # flask
+  #   volumes:
+  #     - ./backend/application/:/usr/src/app/application
+  #   expose:
+  #     - 5010
+  #   environment:
+  #     - DB_PORT=3307
+  #   env_file:
+  #     - ./services/feed/.env.dev
+  #   depends_on:
+  #     - db-manager
+  #     - db
+  #     - auth
   
   db-manager:
     build: ./services/database-manager
     command: python manage.py seed_db
     volumes:
-      - ./backend/application/:/usr/src/app/application
+      - ./backend/:/usr/src/app/application
     environment:
       - DB_PORT=3307
     env_file:
@@ -55,25 +55,25 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
   
-  redis:
-    image: redis:latest
-    restart: always
-    expose:
-      - 6379
-    volumes:
-      - ./cachedata:/root/redis
-      # - ./services/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    # command: --requirepass $${REDIS_PASSWORD}
-    env_file:
-      - ./services/redis/.env.dev
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 5s
-      retries: 5
-      interval: 1s
+  # redis:
+  #   image: redis:latest
+  #   restart: always
+  #   expose:
+  #     - 6379
+  #   volumes:
+  #     - ./cachedata:/root/redis
+  #     # - ./services/redis/redis.conf:/usr/local/etc/redis/redis.conf
+  #   # command: --requirepass $${REDIS_PASSWORD}
+  #   env_file:
+  #     - ./services/redis/.env.dev
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     timeout: 5s
+  #     retries: 5
+  #     interval: 1s
   
   db:
     image: mysql:8

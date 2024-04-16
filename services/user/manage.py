@@ -3,7 +3,7 @@ from flask.cli import FlaskGroup
 import sys
 sys.path.append('./application/')
 
-from user.handlers import app
+from auth_server.__init__ import app
 
 cli = FlaskGroup(app)
 

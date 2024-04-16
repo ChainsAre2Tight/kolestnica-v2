@@ -1,5 +1,5 @@
 from flask import Flask
-import database.models as m
+import libraries.database.models as m
 import os
 
 def seed(app, db):
@@ -112,4 +112,4 @@ def prepare_test_environment() -> None:
     seed(app, db)
 
 if __name__ == "__main__":
-    prepare_test_environment('koleso2_test')
+    prepare_test_environment()

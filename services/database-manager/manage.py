@@ -3,8 +3,8 @@ from flask.cli import FlaskGroup
 import sys
 sys.path.append('./application/')
 
-from database.server import app, db
-from database.db_actuator import seed
+from libraries.database.server import app, db
+from libraries.database.seeder import seed
 
 cli = FlaskGroup(app)
 
