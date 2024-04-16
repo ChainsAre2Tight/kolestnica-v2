@@ -7,8 +7,8 @@ from utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
 from database.models import User, UserLogin, Session
 
 from auth_server.app import db
-from auth_server.actors.sessions.interfaces import SessionCreatorInterface
-from auth_server.helpers.queries import find_user_login_by_login
+from auth_server.services.sessions.interfaces import SessionCreatorInterface
+from auth_server.helpers.queries_helpers import find_user_login_by_login
 
 
 class SessionCreator(SessionCreatorInterface):

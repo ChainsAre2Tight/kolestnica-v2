@@ -7,12 +7,12 @@ from utils.http_wrappers import require_refresh_token, handle_http_exceptions
 from utils.exc import DeprecatedRefreshToken
 
 # chain app and encryptor imports to register all endpoints
-from auth_server.controllers.session import app, json_encryptor
+from auth_server.controllers.sessions_controller import app, json_encryptor
 
 from auth_server.controllers.interfaces import TokenControllerInterface
-from auth_server.actors.sessions.reader import SessionReader
-from auth_server.actors.tokens.creator import TokenPairCreator
-from auth_server.helpers import helpers
+from auth_server.services.sessions.reader import SessionReader
+from auth_server.services.tokens.creator import TokenPairCreator
+from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
 
 
 class TokenController(TokenControllerInterface):
@@ -32,11 +32,11 @@ class TokenController(TokenControllerInterface):
         new_token_pair = TokenPairCreator.create(browser_fingerprint=session.uuid)
 
         # construct response
-        response_data = helpers.provide_access_token(
+        response_data = provide_access_token(
             {'Status': 'Refreshed tokens', 'data': {}},
             token_pair=new_token_pair
         )
-        response = helpers.provide_refresh_token(
+        response = provide_refresh_token(
             response=make_response(jsonify(response_data)),
             token_pair=new_token_pair
         )

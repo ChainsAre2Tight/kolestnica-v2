@@ -6,7 +6,7 @@ from utils.http_wrappers import handle_http_exceptions
 
 from auth_server.app import app, json_encryptor
 from auth_server.controllers.interfaces import UserControllerInterface
-from auth_server.actors.users.creator import UserCreator
+from auth_server.services.users.creator import UserCreator
 
 
 class UserController(UserControllerInterface):

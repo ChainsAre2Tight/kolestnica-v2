@@ -7,14 +7,14 @@ from utils.my_dataclasses import Token
 from utils.http_wrappers import handle_http_exceptions, require_access_token
 
 # chain app and encryptor imports to register all endpoints
-from auth_server.controllers.user import app, json_encryptor
+from auth_server.controllers.users_controller import app, json_encryptor
 
 from auth_server.controllers.interfaces import SessionControllerInterface
-from auth_server.actors.sessions.creator import SessionCreator
-from auth_server.actors.sessions.deleter import SessionDeleter
-from auth_server.actors.sessions.updator import SessionUpdator
-from auth_server.actors.tokens.creator import TokenPairCreator
-from auth_server.helpers import helpers
+from auth_server.services.sessions.creator import SessionCreator
+from auth_server.services.sessions.deleter import SessionDeleter
+from auth_server.services.sessions.updator import SessionUpdator
+from auth_server.services.tokens.creator import TokenPairCreator
+from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
 
 
 class SessionController(SessionControllerInterface):
@@ -46,11 +46,11 @@ class SessionController(SessionControllerInterface):
             )
 
         # construct response
-        response_data = helpers.provide_access_token(
+        response_data = provide_access_token(
             {'Status': 'Logged in', 'data': {}},
             token_pair=signed_token_pair
         )
-        response = helpers.provide_refresh_token(
+        response = provide_refresh_token(
             response=make_response(jsonify(response_data)),
             token_pair=signed_token_pair
         )
@@ -83,4 +83,4 @@ class SessionController(SessionControllerInterface):
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
     def list_sessions(access_token: Token) -> tuple[Response, int]:
-        raise NotImplementedError  # TODO maybe move it to user handler
+        raise NotImplementedError

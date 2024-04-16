@@ -3,8 +3,8 @@
 from utils.my_dataclasses import Session
 from utils.exc import SessionNotFound
 
-from auth_server.actors.sessions.interfaces import SessionReaderIntarface
-from auth_server.helpers.queries import find_session_by_fingerprint
+from auth_server.services.sessions.interfaces import SessionReaderIntarface
+from auth_server.helpers.queries_helpers import find_session_by_fingerprint
 
 
 

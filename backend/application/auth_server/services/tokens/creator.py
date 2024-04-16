@@ -5,8 +5,8 @@ from datetime import datetime
 
 from utils.my_dataclasses import SignedTokenPair, Token
 
-from auth_server.actors.tokens.interfaces import TokenPairCreatorIntarface
-from auth_server.actors.tokens.signatory import Signatory
+from auth_server.services.tokens.interfaces import TokenPairCreatorIntarface
+from auth_server.services.tokens.signatory import Signatory
 
 
 ACCESS_TOKEN_EXPIRY: int = int(os.environ.get('ACCESS_LIFETIME') or 300)

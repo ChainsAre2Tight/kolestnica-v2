@@ -5,7 +5,7 @@ from jwt import encode
 
 from utils.my_dataclasses import Token
 
-from auth_server.interfaces import SignatoryIntarface
+from auth_server.services.tokens.interfaces import SignatoryIntarface
 
 
 TOKEN_SIGNATURE_ALGORITHM = os.environ.get('TOKEN_SIGNATURE_ALG')

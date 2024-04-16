@@ -6,8 +6,8 @@ from utils.exc import DuplicateLoginException, DuplicateUsernameException, UserN
 from database.models import User, UserLogin
 
 from auth_server.app import db
-from auth_server.actors.users.interfaces import UserCreatorIntarface
-from auth_server.helpers.queries import find_user_by_username, find_user_login_by_login
+from auth_server.services.users.interfaces import UserCreatorIntarface
+from auth_server.helpers.queries_helpers import find_user_by_username, find_user_login_by_login
 
 
 class UserCreator(UserCreatorIntarface):
