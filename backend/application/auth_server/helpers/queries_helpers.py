@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 
 from utils.exc import UserNotFound, SessionNotFound
 from database import models
-from auth_server.app import db
+from auth_server import db
 
 
 def find_user_login_by_login(login: str) -> models.UserLogin:

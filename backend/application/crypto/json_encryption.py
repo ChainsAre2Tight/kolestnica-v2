@@ -2,6 +2,7 @@
 
 import os
 import json
+from functools import wraps
 from flask import request, Response
 from typing_extensions import Callable
 
@@ -27,8 +28,9 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
         return JSONEncryptionController(encryption_strategy=encryption)
 
     def encrypt_json(self, provide_data: bool = False) -> Callable:
-        def wrapper(func):
-            def decorated_function(*args, **kwargs):
+        def json_wrapper(func):
+            @wraps(func)
+            def json_decorated_function(*args, **kwargs):
                 key: None | int | str | tuple[int, int] = None
 
                 # if encryption requires key, check if being provided in request headers
@@ -67,8 +69,8 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                 response.data = json.dumps(encrypted_response_data)
 
                 return response, status_code
-            return decorated_function
-        return wrapper
+            return json_decorated_function
+        return json_wrapper
 
     def _encrypt_dict(
             self,

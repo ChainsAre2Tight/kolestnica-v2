@@ -6,8 +6,7 @@ from utils import exc
 from utils.my_dataclasses import Token
 from utils.http_wrappers import handle_http_exceptions, require_access_token
 
-# chain app and encryptor imports to register all endpoints
-from auth_server.controllers.users_controller import app, json_encryptor
+from auth_server import app, json_encryptor
 
 from auth_server.controllers.interfaces import SessionControllerInterface
 from auth_server.services.sessions.creator import SessionCreator
@@ -23,22 +22,22 @@ class SessionController(SessionControllerInterface):
     @app.route('/api/auth/login', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def login_user(credentials: dict) -> tuple[Response, int]:
+    def login_user(data: dict) -> tuple[Response, int]:
         try:
             new_session = SessionCreator.create(
-                login=credentials['login'],
-                pwdh=credentials['pwdh'],
-                browser_fingerprint=credentials['fingerprint']
+                login=data['login'],
+                pwdh=data['pwdh'],
+                browser_fingerprint=data['fingerprint']
             )
         except exc.AlreadyLoggedIn:
-            SessionDeleter.delete(browser_fingerprint=credentials['fingerprint'])
+            SessionDeleter.delete(browser_fingerprint=data['fingerprint'])
         new_session = SessionCreator.create(
-                login=credentials['login'],
-                pwdh=credentials['pwdh'],
-                browser_fingerprint=credentials['fingerprint']
+                login=data['login'],
+                pwdh=data['pwdh'],
+                browser_fingerprint=data['fingerprint']
             )
 
-        signed_token_pair = TokenPairCreator.create(browser_fingerprint=credentials['fingerprint'])
+        signed_token_pair = TokenPairCreator.create(browser_fingerprint=data['fingerprint'])
 
         SessionUpdator.update_refresh_token(
                 session_id=new_session.id,

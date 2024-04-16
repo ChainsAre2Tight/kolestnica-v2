@@ -8,8 +8,16 @@ import json
 import utils.exc as exc
 from flask import Response, make_response
 
-from user.tokens import decode_token
+
 from utils.my_dataclasses import Token
+
+def decode_token(raw_token: str) -> Token:
+    return Token(**jwt.decode(
+        jwt=raw_token,
+        key='secret',
+        algorithms=['HS256']
+    ))
+
 
 def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
     """

@@ -6,7 +6,7 @@ from utils.my_dataclasses import Session as d_Session
 from utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
 from database.models import User, UserLogin, Session
 
-from auth_server.app import db
+from auth_server import db
 from auth_server.services.sessions.interfaces import SessionCreatorInterface
 from auth_server.helpers.queries_helpers import find_user_login_by_login
 

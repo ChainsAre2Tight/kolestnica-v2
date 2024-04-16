@@ -5,7 +5,7 @@ from utils.my_dataclasses import CurrentUser
 from utils.exc import DuplicateLoginException, DuplicateUsernameException, UserNotFound
 from database.models import User, UserLogin
 
-from auth_server.app import db
+from auth_server import db
 from auth_server.services.users.interfaces import UserCreatorIntarface
 from auth_server.helpers.queries_helpers import find_user_by_username, find_user_login_by_login
 

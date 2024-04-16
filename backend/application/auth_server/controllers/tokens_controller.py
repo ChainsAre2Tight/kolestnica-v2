@@ -6,8 +6,7 @@ from utils.my_dataclasses import Token
 from utils.http_wrappers import require_refresh_token, handle_http_exceptions
 from utils.exc import DeprecatedRefreshToken
 
-# chain app and encryptor imports to register all endpoints
-from auth_server.controllers.sessions_controller import app, json_encryptor
+from auth_server import app, json_encryptor
 
 from auth_server.controllers.interfaces import TokenControllerInterface
 from auth_server.services.sessions.reader import SessionReader

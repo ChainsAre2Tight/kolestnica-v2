@@ -3,7 +3,7 @@
 
 from utils.exc import SessionNotFound
 
-from auth_server.app import db
+from auth_server import db
 from auth_server.services.sessions.interfaces import SessionDeleterInterface
 from auth_server.helpers.queries_helpers import find_session_by_fingerprint
 
