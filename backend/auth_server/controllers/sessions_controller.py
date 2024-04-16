@@ -1,13 +1,14 @@
 """Provides endpoints for session management"""
 
+
 from flask import make_response, Response, jsonify
 
-from utils import exc
-from utils.my_dataclasses import Token
-from utils.http_wrappers import handle_http_exceptions, require_access_token
+from libraries.utils import exc
+from libraries.utils.my_dataclasses import Token
+from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token
+from libraries.crypto import json_encryptor
 
-from auth_server import app, json_encryptor
-
+from auth_server import app
 from auth_server.controllers.interfaces import SessionControllerInterface
 from auth_server.services.sessions.creator import SessionCreator
 from auth_server.services.sessions.deleter import SessionDeleter
@@ -31,16 +32,16 @@ class SessionController(SessionControllerInterface):
             )
         except exc.AlreadyLoggedIn:
             SessionDeleter.delete(browser_fingerprint=data['fingerprint'])
-        new_session = SessionCreator.create(
-                login=data['login'],
-                pwdh=data['pwdh'],
-                browser_fingerprint=data['fingerprint']
-            )
+            new_session = SessionCreator.create(
+                    login=data['login'],
+                    pwdh=data['pwdh'],
+                    browser_fingerprint=data['fingerprint']
+                )
 
         signed_token_pair = TokenPairCreator.create(browser_fingerprint=data['fingerprint'])
 
         SessionUpdator.update_refresh_token(
-                session_id=new_session.id,
+                browser_fingerprint=new_session.uuid,
                 new_refresh_token=signed_token_pair.refresh
             )
 
@@ -59,6 +60,7 @@ class SessionController(SessionControllerInterface):
     @staticmethod
     @app.route('/api/auth/logout', methods=['POST'])
     @require_access_token
+    @handle_http_exceptions
     def logout(access_token: Token) -> tuple[Response, int]:
 
         SessionDeleter.delete(browser_fingerprint=access_token.sessionId)

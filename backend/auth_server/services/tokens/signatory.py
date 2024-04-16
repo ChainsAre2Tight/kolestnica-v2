@@ -3,7 +3,7 @@
 import os
 from jwt import encode
 
-from utils.my_dataclasses import Token
+from libraries.utils.my_dataclasses import Token
 
 from auth_server.services.tokens.interfaces import SignatoryIntarface
 

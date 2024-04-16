@@ -2,9 +2,10 @@
 
 from flask import Response, jsonify
 
-from utils.http_wrappers import handle_http_exceptions
+from libraries.utils.http_wrappers import handle_http_exceptions
+from libraries.crypto import json_encryptor
 
-from auth_server import app, json_encryptor
+from auth_server import app
 from auth_server.controllers.interfaces import UserControllerInterface
 from auth_server.services.users.creator import UserCreator
 

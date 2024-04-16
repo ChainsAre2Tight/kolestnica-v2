@@ -1,7 +1,7 @@
 """Provides a session deleter class"""
 
 
-from utils.exc import SessionNotFound
+from libraries.utils.exc import SessionNotFound
 
 from auth_server import db
 from auth_server.services.sessions.interfaces import SessionDeleterInterface

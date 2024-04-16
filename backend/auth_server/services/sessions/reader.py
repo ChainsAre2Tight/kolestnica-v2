@@ -1,11 +1,11 @@
+"""Contains session reader"""
 
 
-from utils.my_dataclasses import Session
-from utils.exc import SessionNotFound
+from libraries.utils.my_dataclasses import Session
+from libraries.utils.exc import SessionNotFound
 
 from auth_server.services.sessions.interfaces import SessionReaderIntarface
 from auth_server.helpers.queries_helpers import find_session_by_fingerprint
-
 
 
 class SessionReader(SessionReaderIntarface):

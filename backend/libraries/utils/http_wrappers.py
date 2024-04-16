@@ -1,15 +1,15 @@
 """This module contains wrappers for Flask request handlers"""
 
+
 from functools import wraps, partial
 from typing import Callable
-from flask import request, jsonify
-import jwt
 import json
-import utils.exc as exc
-from flask import Response, make_response
 
+import jwt
+from flask import Response, make_response, request, jsonify
 
-from utils.my_dataclasses import Token
+from libraries.utils import exc
+from libraries.utils.my_dataclasses import Token
 
 def decode_token(raw_token: str) -> Token:
     return Token(**jwt.decode(
@@ -17,7 +17,6 @@ def decode_token(raw_token: str) -> Token:
         key='secret',
         algorithms=['HS256']
     ))
-
 
 def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
     """
@@ -138,7 +137,7 @@ def handle_http_exceptions(
         except exc.InvalidLoginData as e:
             return make_err_response('Invalid login or password', e), 404
         except exc.SessionNotFound as e:
-            return make_err_response('Session was already terminated or didnt exist in the first place', e), 410
+            return make_err_response('Session was already terminated or didnt exist in the first place', e), 401
         except exc.BadEncryptionKeys as e:
             return make_err_response('Missing encryption keys', e), 401
     

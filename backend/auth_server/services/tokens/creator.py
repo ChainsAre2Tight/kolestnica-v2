@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 
-from utils.my_dataclasses import SignedTokenPair, Token
+from libraries.utils.my_dataclasses import SignedTokenPair, Token
 
 from auth_server.services.tokens.interfaces import TokenPairCreatorIntarface
 from auth_server.services.tokens.signatory import Signatory
