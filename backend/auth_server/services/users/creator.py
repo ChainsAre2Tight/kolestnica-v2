@@ -1,9 +1,9 @@
 """Conatins user creator"""
 
 
-from utils.my_dataclasses import CurrentUser
-from utils.exc import DuplicateLoginException, DuplicateUsernameException, UserNotFound
-from database.models import User, UserLogin
+from libraries.utils.my_dataclasses import CurrentUser
+from libraries.utils.exc import DuplicateLoginException, DuplicateUsernameException, UserNotFound
+from libraries.database.models import User, UserLogin
 
 from auth_server import db
 from auth_server.services.users.interfaces import UserCreatorIntarface

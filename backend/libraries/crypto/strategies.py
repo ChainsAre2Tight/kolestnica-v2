@@ -7,8 +7,8 @@ Alivable strategies:
 - RSA (TBA)
 """
 
-from utils.exc import BadEncryptionKeys
-from crypto.interfaces import EncryptionStrategyInterface
+from libraries.utils.exc import BadEncryptionKeys
+from libraries.crypto.interfaces import EncryptionStrategyInterface
 
 
 class IdleEncryptionStrategy(EncryptionStrategyInterface):

@@ -2,14 +2,15 @@
 
 from flask import Response, jsonify, make_response
 
-from utils.my_dataclasses import Token
-from utils.http_wrappers import require_refresh_token, handle_http_exceptions
-from utils.exc import DeprecatedRefreshToken
+from libraries.utils.my_dataclasses import Token
+from libraries.utils.http_wrappers import require_refresh_token, handle_http_exceptions
+from libraries.utils.exc import DeprecatedRefreshToken
+from libraries.crypto import json_encryptor
 
-from auth_server import app, json_encryptor
-
+from auth_server import app
 from auth_server.controllers.interfaces import TokenControllerInterface
 from auth_server.services.sessions.reader import SessionReader
+from auth_server.services.sessions.updator import SessionUpdator
 from auth_server.services.tokens.creator import TokenPairCreator
 from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
 
@@ -29,6 +30,11 @@ class TokenController(TokenControllerInterface):
             raise DeprecatedRefreshToken('Provided refresh token does not match any records')
 
         new_token_pair = TokenPairCreator.create(browser_fingerprint=session.uuid)
+
+        SessionUpdator.update_refresh_token(
+            browser_fingerprint=session.uuid,
+            new_refresh_token=new_token_pair.refresh
+        )
 
         # construct response
         response_data = provide_access_token(

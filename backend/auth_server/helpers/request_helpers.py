@@ -2,7 +2,7 @@
 
 from flask import Response
 
-import utils.my_dataclasses as dataclass
+import libraries.utils.my_dataclasses as dataclass
 
 def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenPair) -> dict:
     """`Writes` access and expiry fields into data field of provided response dictionary

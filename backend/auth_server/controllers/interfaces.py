@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from flask import Response
 
-from utils.my_dataclasses import Token
+from libraries.utils.my_dataclasses import Token
 
 
 class UserControllerInterface(ABC):

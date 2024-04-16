@@ -2,9 +2,9 @@
 
 from sqlalchemy.exc import IntegrityError
 
-from utils.my_dataclasses import Session as d_Session
-from utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
-from database.models import User, UserLogin, Session
+from libraries.utils.my_dataclasses import Session as d_Session
+from libraries.utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
+from libraries.database.models import User, UserLogin, Session
 
 from auth_server import db
 from auth_server.services.sessions.interfaces import SessionCreatorInterface
@@ -45,3 +45,4 @@ class SessionCreator(SessionCreatorInterface):
         except IntegrityError:
             db.session.rollback()
             raise AlreadyLoggedIn
+        return Session

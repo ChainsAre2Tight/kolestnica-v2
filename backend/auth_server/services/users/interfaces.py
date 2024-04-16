@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from utils.my_dataclasses import CurrentUser, Session
+from libraries.utils.my_dataclasses import CurrentUser, Session
 
 
 class UserReaderInterface(ABC):

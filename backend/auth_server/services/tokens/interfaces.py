@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from utils.my_dataclasses import SignedTokenPair, Token
+from libraries.utils.my_dataclasses import SignedTokenPair, Token
 
 class SignatoryIntarface(ABC):
 

@@ -2,8 +2,8 @@
 
 from sqlalchemy.exc import NoResultFound
 
-from utils.exc import UserNotFound, SessionNotFound
-from database import models
+from libraries.utils.exc import UserNotFound, SessionNotFound
+from libraries.database import models
 from auth_server import db
 
 
