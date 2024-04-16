@@ -5,8 +5,8 @@ import os
 
 from flask import Flask
 
-from database.models import db
-from crypto.json_encryption import JSONEncryptionController
+from libaries.database.models import db
+from libaries.crypto.json_encryption import JSONEncryptionController
 
 
 app = Flask('User server')
