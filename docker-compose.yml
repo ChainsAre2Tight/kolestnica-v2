@@ -80,6 +80,8 @@ services:
     restart: always
     expose:
       - 3307
+    ports:
+      - 3307:3307
     environment:
       - MYSQL_TCP_PORT=3307
     env_file:

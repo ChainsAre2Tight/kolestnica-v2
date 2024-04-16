@@ -45,4 +45,4 @@ class SessionCreator(SessionCreatorInterface):
         except IntegrityError:
             db.session.rollback()
             raise AlreadyLoggedIn
-        return Session
+        return session

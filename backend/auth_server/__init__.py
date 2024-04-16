@@ -15,9 +15,9 @@ db_password = os.environ.get('DB_PASSWORD')
 db_name = os.environ.get('DB_NAME')
 db_port = os.environ.get('DB_PORT')
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = \
-#     f'{db_url}://{db_username}:{db_password}@db:{db_port}/{db_name}'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/koleso2_test'
+app.config['SQLALCHEMY_DATABASE_URI'] = \
+    f'{db_url}://{db_username}:{db_password}@db:{db_port}/{db_name}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/koleso2_test'
 
 app.config['SECRET_KEY'] = os.environ.get('FLASK-SECRET-KEY') or 'secret'
 app.config['SQLALCHEMY_ECHO'] = False
