@@ -30,7 +30,7 @@ def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
     def decorated_function(*args, **kwargs):
         try:
             raw_token: str = dict(request.headers)['Authorization']
-            token: Token = decode_token(raw_token=raw_token)
+            access_token: Token = decode_token(raw_token=raw_token)
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
             return jsonify({
                 'Staus': 'Error',
@@ -41,8 +41,8 @@ def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
                 'Staus': 'Error',
                 'details': 'Access token is expired'
             }), 403
-
-        return func(token, *args, **kwargs)
+        kwargs['access_token'] = access_token
+        return func(*args, **kwargs)
     return decorated_function
 
 def require_refresh_token(func: Callable | None=None) -> tuple[Response, int] | Callable:
@@ -71,7 +71,10 @@ data to decorated function
                 'details': 'Refresh token is expired'
             }), 403
 
-        return func(raw_token, decoded_token, *args, **kwargs)
+        kwargs['raw_token'] = raw_token
+        kwargs['refresh_token'] = decoded_token
+
+        return func(*args, **kwargs)
     return decorated_function
 
 def handle_http_exceptions(func: Callable) -> Callable | tuple[Response, int]:
@@ -104,7 +107,7 @@ def handle_http_exceptions(func: Callable) -> Callable | tuple[Response, int]:
             return make_err_response("Action is prohibited", e), 403
         except exc.UserNotFoundException as e:
             return make_err_response('Requested user does not exist', e), 404
-        except exc.RequestAlreadyFullfilledException as e:
+        except exc.RequestAlreadyFullfilled as e:
             return make_err_response("Requirement is already fullfilled", e), 406
         except exc.DeprecatedRefreshToken as e:
             return make_err_response("Refresk token is invalid or has expired", e), 401

@@ -1,15 +1,15 @@
 """This module contains various custom exceptions used throught the project"""
 
 
-class WrappedFunctionMissingKeyword(BaseException):
+class WrappedFunctionMissingKeyword(Exception):
     """Raised when wrapped function is missing certain keyword"""
 
 
-class CacheMiss(BaseException):
+class CacheMiss(Exception):
     """Raised when requested key does not exist in key"""
 
 
-class HTTPException(BaseException):
+class HTTPException(Exception):
     """A base class for exceptions that invoke an HTTP error response"""
 
 
@@ -25,19 +25,11 @@ class NotPermittedException(HTTPException):
     """Raised when user can access content but cannot perform requested action against it"""
 
 
-class UserNotFoundException(HTTPException):
-    """Raised when specified user cannot be found in the database"""
-
-
-class SessionNotFound(HTTPException):
-    """Raised when session with specified uuid cannot be found in the database"""
-
-
 class UserNotFound(HTTPException):
     """Raised when user with specified data cannot be found in the database"""
 
 
-class RequestAlreadyFullfilledException(HTTPException):
+class RequestAlreadyFullfilled(HTTPException):
     """Raised when requested action is not needed as requirement is already fullfilled"""
 
 
@@ -63,3 +55,23 @@ class DeprecatedRefreshToken(HTTPException):
 
 class BadEncryptionKeys(HTTPException):
     """Raised when client didnt provide encryption keys upon request that are requered by current encryption policy"""
+
+
+class ChatNotFound(Exception):
+    """Raised when chat with specified data cannot be found in the database"""
+
+
+class UserNotFoundException(HTTPException):
+    """Raised when specified user cannot be found in the database"""
+
+
+class SessionNotFound(HTTPException):
+    """Raised when session with specified uuid cannot be found in the database"""
+
+
+class MessageNotFound(Exception):
+    """Raised when message with specified data cannot be found in the database"""
+
+
+class ConflictingData(Exception):
+    """Raised when data sent in request conflicts data on server"""

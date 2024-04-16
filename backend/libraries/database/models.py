@@ -47,7 +47,6 @@ class Session(db.Model):
     uuid: Mapped[str] = mapped_column(String(100), unique=True, nullable=True)
     refresh_token: Mapped[str] = mapped_column(String(300), unique=True, nullable=True)
     socketId: Mapped[str] = mapped_column(String(128), unique=True, nullable=True)
-
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
     user: Mapped["User"] = relationship(back_populates='sessions')
 

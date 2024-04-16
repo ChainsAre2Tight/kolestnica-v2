@@ -11,7 +11,7 @@ class UserControllerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def register_user(credentials: dict) -> tuple[Response, int]:
+    def register_user(data: dict) -> tuple[Response, int]:
         """Registers user"""
 
 
@@ -19,7 +19,7 @@ class SessionControllerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def login_user(credentials: dict) -> tuple[Response, int]:
+    def login_user(data: dict) -> tuple[Response, int]:
         """Logs user in"""
 
     @staticmethod
