@@ -18,7 +18,7 @@ from feed_server.services.messages.deleter import MessageDeleter
 class MessageController(MessageControllerInterface):
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/messages', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -38,7 +38,7 @@ class MessageController(MessageControllerInterface):
         return jsonify(response_data), 200
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -59,7 +59,7 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/messages', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -83,7 +83,7 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['PATCH'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['PATCH'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -112,7 +112,7 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()

@@ -17,7 +17,7 @@ from feed_server.services.members.lister import MemberLister
 class MembersController(MembersControllerInterface):
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/members', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -39,7 +39,7 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/members', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -62,7 +62,7 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members/<int:target_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>/members/<int:target_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()

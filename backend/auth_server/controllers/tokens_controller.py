@@ -18,7 +18,7 @@ from auth_server.helpers.request_helpers import provide_access_token, provide_re
 class TokenController(TokenControllerInterface):
 
     @staticmethod
-    @app.route('/api/auth/tokens', methods=['GET'])
+    @app.route('/api/tokens', methods=['GET'])
     @require_refresh_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()

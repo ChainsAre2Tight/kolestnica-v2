@@ -16,7 +16,7 @@ from feed_server.services.chats.reader import ChatReader
 class ChatController(ChatControllerIntarface):
 
     @staticmethod
-    @app.route('/api/data/chats', methods=['GET'])
+    @app.route('/api/chats', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -35,7 +35,7 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -52,7 +52,7 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats', methods=['POST'])
+    @app.route('/api/chats', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -72,7 +72,7 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['PATCH'])
+    @app.route('/api/chats/<int:chat_id>', methods=['PATCH'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -81,7 +81,7 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()

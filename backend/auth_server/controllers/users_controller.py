@@ -15,14 +15,14 @@ from auth_server.services.users.creator import UserCreator
 class UserController(UserControllerInterface):
 
     @staticmethod
-    @app.route('/api/auth/users/<int:user_id>', methods=['GET'])
+    @app.route('/api/users/<int:user_id>', methods=['GET'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
     def show_user(access_token: Token, user_id: int) -> tuple[Response, int]:
         raise NotImplementedError
 
     @staticmethod
-    @app.route('/api/auth/users/current', methods=['GET'])
+    @app.route('/api/users/current', methods=['GET'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
     def show_current_user(access_token: Token) -> tuple[Response, int]:
@@ -30,7 +30,7 @@ class UserController(UserControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/auth/users', methods=['POST'])
+    @app.route('/api/users', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
     def create_user(data: dict) -> tuple[Response, int]:
