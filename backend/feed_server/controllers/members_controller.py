@@ -22,7 +22,7 @@ class MembersController(MembersControllerInterface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def get_members(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def list(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberLister.list_members(chat_id=chat_id, issuer_id=user_id)
@@ -36,7 +36,7 @@ class MembersController(MembersControllerInterface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def add_member(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberAdder.add_member(
@@ -50,17 +50,17 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members/<int:message_id>', methods=['DELETE'])
+    @app.route('/api/feed/chats/<int:chat_id>/members/<int:target_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
-    @json_encryptor.encrypt_json(provide_data=True)
-    def remove_member(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    @json_encryptor.encrypt_json()
+    def delete(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberRemover.remove_member(
             chat_id=chat_id,
             issuer_id=user_id,
-            target_id=data['user_id']
+            target_id=target_id
         )
 
         result = convert_dataclass_to_dict(members)

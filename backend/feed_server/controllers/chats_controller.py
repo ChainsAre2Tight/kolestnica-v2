@@ -17,23 +17,12 @@ from feed_server.services.chats.reader import ChatReader
 class ChatController(ChatControllerIntarface):
 
     @staticmethod
-    @app.route('/api/data/chats', methods=['POST'])
+    @app.route('/api/data/chats', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def get_chats(access_token: Token) -> tuple[Response, int]:
+    def index(access_token: Token) -> tuple[Response, int]:
         raise NotImplementedError
-
-    @staticmethod
-    @app.route('/api/data/chats', methods=['POST'])
-    @require_access_token
-    @handle_http_exceptions
-    @json_encryptor.encrypt_json(provide_data=True)
-    def create_chat(access_token: Token, data: dict) -> tuple[Response, int]:
-
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
-        chat = ChatCreator.create(chat_name=data['name'], user_id=user_id)
-        return jsonify(chat.__dict__), 201
 
 
     @staticmethod
@@ -41,7 +30,7 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def get_chat_data(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def show(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         chat = ChatReader.get_chat_data(chat_id=chat_id, user_id=user_id)
@@ -49,11 +38,23 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['PUT'])
+    @app.route('/api/data/chats', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def update_chat(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def create(access_token: Token, data: dict) -> tuple[Response, int]:
+
+        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
+        chat = ChatCreator.create(chat_name=data['name'], user_id=user_id)
+        return jsonify(chat.__dict__), 201
+
+
+    @staticmethod
+    @app.route('/api/data/chats/<int:chat_id>', methods=['PATCH'])
+    @require_access_token
+    @handle_http_exceptions
+    @json_encryptor.encrypt_json(provide_data=True)
+    def update(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
         raise NotImplementedError
 
 
@@ -62,5 +63,5 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete_chat(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def delete(access_token: Token, chat_id: int) -> tuple[Response, int]:
         raise NotImplementedError
