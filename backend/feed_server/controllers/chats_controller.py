@@ -20,7 +20,7 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def index(access_token: Token) -> tuple[Response, int]:
+    def index_chats(access_token: Token) -> tuple[Response, int]:
 
         chats = ChatReader.get_chats(browser_fingerprint=access_token.sessionId)
         chats_data = convert_dataclass_to_dict(chats)
@@ -39,7 +39,7 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def show(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def show_chat(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         chat = ChatReader.get_chat_data(chat_id=chat_id, browser_fingerprint=access_token.sessionId)
         response_data = {
@@ -56,7 +56,7 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(access_token: Token, data: dict) -> tuple[Response, int]:
+    def create_chat(access_token: Token, data: dict) -> tuple[Response, int]:
 
         chat = ChatCreator.create(
             chat_name=data['name'],
@@ -76,7 +76,7 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def update(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def update_chat(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
         raise NotImplementedError
 
 
@@ -85,5 +85,5 @@ class ChatController(ChatControllerIntarface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def delete_chat(access_token: Token, chat_id: int) -> tuple[Response, int]:
         raise NotImplementedError
