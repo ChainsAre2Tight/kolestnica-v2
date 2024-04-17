@@ -18,10 +18,10 @@ class ChatReaderInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def get_chats(user_id: int) -> list[Chat]:
+    def get_chats(browser_fingerprint: str) -> list[Chat]:
         pass
 
     @staticmethod
     @abstractmethod
-    def get_chat_data(chat_id: int, user_id: int) -> Chat:
+    def get_chat_data(chat_id: int, browser_fingerprint: str) -> Chat:
         pass

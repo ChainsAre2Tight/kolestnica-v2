@@ -6,14 +6,15 @@ from libraries.database import models
 
 from feed_server import db
 from feed_server.services.chats.interfaces import ChatCreatorInterface
-from feed_server.helpers.quiries_helpers import get_user_by_id
+import feed_server.helpers.quiries_helpers as quiry
 
 
 class ChatCreator(ChatCreatorInterface):
 
     @classmethod
-    def create(cls, chat_name: str, user_id: int) -> Chat:
-        user = get_user_by_id(user_id=user_id)
+    def create(cls, chat_name: str, browser_fingerprint: str) -> Chat:
+        user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
+        user = quiry.get_user_by_id(user_id=user_id)
         chat = cls._construct(chat_name=chat_name, user=user)
         db.session.add(chat)
         db.session.commit()
