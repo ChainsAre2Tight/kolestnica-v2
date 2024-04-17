@@ -3,10 +3,10 @@
 from typing import Callable
 import os
 
-from utils.wrapper_checks import check_for_keyword_in_kwargs
-from utils.exc import CacheMiss
-import cache.interfaces as interface
-import cache.strategies as strategy
+from libraries.utils.wrapper_checks import check_for_keyword_in_kwargs
+from libraries.utils.exc import CacheMiss
+import libraries.cache.interfaces as interface
+import libraries.cache.strategies as strategy
 
 
 class CacheController(interface.CacheControllerInterface):
