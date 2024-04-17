@@ -25,12 +25,12 @@ class ChatController(ChatControllerIntarface):
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         chats = ChatReader.get_chats(user_id=user_id)
-        chast_data = convert_dataclass_to_dict(chats)
+        chats_data = convert_dataclass_to_dict(chats)
 
         response_data = {
             'Status': 'OK',
             'data': {
-                'chats': chast_data
+                'chats': chats_data
             }
         }
         return jsonify(response_data), 200
