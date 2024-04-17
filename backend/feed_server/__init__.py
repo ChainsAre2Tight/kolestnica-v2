@@ -24,3 +24,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 
+from feed_server.controllers import chats_controller, messages_controller, members_controller
