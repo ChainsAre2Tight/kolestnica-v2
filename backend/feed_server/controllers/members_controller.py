@@ -27,8 +27,14 @@ class MembersController(MembersControllerInterface):
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberLister.list_members(chat_id=chat_id, issuer_id=user_id)
 
-        result = convert_dataclass_to_dict(members)
-        return jsonify(result), 200
+        members_data = convert_dataclass_to_dict(members)
+        response_data = {
+            'Status': 'OK',
+            'data': {
+                'chats': members_data
+            }
+        }
+        return jsonify(response_data), 200
 
 
     @staticmethod
@@ -45,8 +51,14 @@ class MembersController(MembersControllerInterface):
             target_id=data['user_id']
         )
 
-        result = convert_dataclass_to_dict(members)
-        return jsonify(result), 201
+        members_data = convert_dataclass_to_dict(members)
+        response_data = {
+            'Status': 'OK',
+            'data': {
+                'chats': members_data
+            }
+        }
+        return jsonify(response_data), 201
 
 
     @staticmethod
@@ -63,5 +75,11 @@ class MembersController(MembersControllerInterface):
             target_id=target_id
         )
 
-        result = convert_dataclass_to_dict(members)
-        return jsonify(result), 200
+        members_data = convert_dataclass_to_dict(members)
+        response_data = {
+            'Status': 'OK',
+            'data': {
+                'chats': members_data
+            }
+        }
+        return jsonify(response_data), 200
