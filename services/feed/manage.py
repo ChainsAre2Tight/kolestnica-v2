@@ -3,7 +3,7 @@ from flask.cli import FlaskGroup
 import sys
 sys.path.append('./application/')
 
-from feed.handlers import app
+from feed_server import app
 
 cli = FlaskGroup(app)
 

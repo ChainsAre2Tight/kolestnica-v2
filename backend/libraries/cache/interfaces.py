@@ -1,5 +1,6 @@
 """This module provides caching interface"""
 
+
 from abc import ABC, abstractmethod
 
 
@@ -52,6 +53,15 @@ class CacheControllerInterface(ABC):
 
         Args:
             keyword (str): key of KWARGS
+        """
+
+    @abstractmethod
+    def write_into_cache(self, key: str, value) -> None:
+        """Updates cache  by writing new data
+
+        Args:
+            key (str): key
+            value (any hashable): data to update
         """
 
     @staticmethod

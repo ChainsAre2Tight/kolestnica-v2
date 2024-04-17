@@ -17,11 +17,11 @@ from feed_server.services.members.lister import MemberLister
 class MembersController(MembersControllerInterface):
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/members', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def list(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def index_members(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         members = MemberLister.list_members(
             chat_id=chat_id,
@@ -39,11 +39,11 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/members', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def create_member(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
         members = MemberAdder.add_member(
             chat_id=chat_id,
@@ -62,11 +62,11 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/feed/chats/<int:chat_id>/members/<int:target_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>/members/<int:target_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
+    def delete_member(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
 
         members = MemberRemover.remove_member(
             chat_id=chat_id,

@@ -1,5 +1,6 @@
 """Provides session updator class"""
 
+
 from libraries.utils.exc import SessionNotFound
 
 from auth_server import db

@@ -21,19 +21,19 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/auth/users/current/sessions', methods=['GET'])
+    @app.route('/api/users/current/sessions', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def index(access_token: Token) -> tuple[Response, int]:
+    def index_sessions(access_token: Token) -> tuple[Response, int]:
         raise NotImplementedError
 
 
     @staticmethod
-    @app.route('/api/auth/users/current/sessions', methods=['POST'])
+    @app.route('/api/users/current/sessions', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(data: dict) -> tuple[Response, int]:
+    def create_session(data: dict) -> tuple[Response, int]:
         try:
             new_session = SessionCreator.create(
                 login=data['login'],
@@ -73,10 +73,10 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/auth/users/current/sessions/current', methods=['DELETE'])
+    @app.route('/api/users/current/sessions/current', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
-    def delete_current(access_token: Token) -> tuple[Response, int]:
+    def delete_current_session(access_token: Token) -> tuple[Response, int]:
 
         SessionDeleter.delete(browser_fingerprint=access_token.sessionId)
         response_data = {

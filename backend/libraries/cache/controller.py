@@ -13,7 +13,7 @@ import cache.strategies as strategy
 
 @singleton
 class CacheController(interface.CacheControllerInterface):
-    """Provides decorators for cache interactions"""
+    """Provides logic for cache interactions"""
 
     def __init__(self, cache_strategy: interface.CachingStrategyInterface):
         self._cache_strategy = cache_strategy
@@ -48,6 +48,9 @@ class CacheController(interface.CacheControllerInterface):
                 return func(*args, **kwargs)
             return decorated_function
         return wrapper
+
+    def write_into_cache(self, key: str, value) -> None:
+        self._cache_strategy.write_into_cache(key=key, value=value)
 
     @staticmethod
     def build():

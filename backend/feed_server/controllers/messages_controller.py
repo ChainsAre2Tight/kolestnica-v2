@@ -18,11 +18,11 @@ from feed_server.services.messages.deleter import MessageDeleter
 class MessageController(MessageControllerInterface):
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/messages', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def index(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def index_messages(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         messages = MessageGetter.list_messages(
             chat_id=chat_id,
@@ -38,11 +38,11 @@ class MessageController(MessageControllerInterface):
         return jsonify(response_data), 200
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def show(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
+    def show_message(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
 
         message = MessageGetter.get_message(
             chat_id=chat_id,
@@ -59,11 +59,11 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/messages', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def create_message(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
         message_id = MessageCreator.create_message(
             browser_fingerprint=access_token.sessionId,
@@ -83,7 +83,7 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['PATCH'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['PATCH'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
@@ -112,11 +112,11 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>/messages/<int:message_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>/messages/<int:message_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
+    def delete_message(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
 
         message_id = MessageDeleter.delete_message(
             browser_fingerprint=access_token.sessionId,

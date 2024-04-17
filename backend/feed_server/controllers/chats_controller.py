@@ -16,11 +16,11 @@ from feed_server.services.chats.reader import ChatReader
 class ChatController(ChatControllerIntarface):
 
     @staticmethod
-    @app.route('/api/data/chats', methods=['GET'])
+    @app.route('/api/chats', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def index(access_token: Token) -> tuple[Response, int]:
+    def index_chats(access_token: Token) -> tuple[Response, int]:
 
         chats = ChatReader.get_chats(browser_fingerprint=access_token.sessionId)
         chats_data = convert_dataclass_to_dict(chats)
@@ -35,11 +35,11 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def show(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def show_chat(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         chat = ChatReader.get_chat_data(chat_id=chat_id, browser_fingerprint=access_token.sessionId)
         response_data = {
@@ -52,11 +52,11 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats', methods=['POST'])
+    @app.route('/api/chats', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(access_token: Token, data: dict) -> tuple[Response, int]:
+    def create_chat(access_token: Token, data: dict) -> tuple[Response, int]:
 
         chat = ChatCreator.create(
             chat_name=data['name'],
@@ -72,18 +72,18 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['PATCH'])
+    @app.route('/api/chats/<int:chat_id>', methods=['PATCH'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def update(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def update_chat(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
         raise NotImplementedError
 
 
     @staticmethod
-    @app.route('/api/data/chats/<int:chat_id>', methods=['DELETE'])
+    @app.route('/api/chats/<int:chat_id>', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def delete_chat(access_token: Token, chat_id: int) -> tuple[Response, int]:
         raise NotImplementedError

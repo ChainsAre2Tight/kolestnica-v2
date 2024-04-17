@@ -2,6 +2,7 @@
 
 from sqlalchemy.exc import IntegrityError
 
+from libraries.cache import cache_controller
 from libraries.utils.my_dataclasses import Session as d_Session
 from libraries.utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
 from libraries.database.models import User, UserLogin, Session
@@ -19,6 +20,9 @@ class SessionCreator(SessionCreatorInterface):
         session = SessionCreator._create_session(user=user, browser_fingerprint=browser_fingerprint)
 
         session_data = d_Session.from_model(session)
+
+        cache_controller.write_into_cache(session.uuid, user.id)
+
         return session_data
 
 
