@@ -9,7 +9,6 @@ from libraries.crypto import json_encryptor
 
 from feed_server import app
 from feed_server.controllers.interfaces import MessageControllerInterface
-from feed_server.helpers.quiries_helpers import get_user_id_by_browser_fingerprint
 from feed_server.services.messages.getter import MessageGetter
 from feed_server.services.messages.creator import MessageCreator
 from feed_server.services.messages.updater import MessageUpdater
@@ -25,9 +24,10 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json()
     def index(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
-        messages = MessageGetter.list_messages(user_id=user_id, chat_id=chat_id)
-
+        messages = MessageGetter.list_messages(
+            chat_id=chat_id,
+            browser_fingerprint=access_token.sessionId
+        )
         messages_data = convert_dataclass_to_dict(messages)
         response_data = {
             'Status': 'OK',
@@ -44,9 +44,11 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json()
     def show(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
-        message = MessageGetter.get_message(user_id=user_id, chat_id=chat_id, message_id=message_id)
-
+        message = MessageGetter.get_message(
+            chat_id=chat_id,
+            message_id=message_id,
+            browser_fingerprint=access_token.sessionId
+        )
         response_data = {
             'Status': 'OK',
             'data': {
@@ -63,14 +65,12 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json(provide_data=True)
     def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         message_id = MessageCreator.create_message(
-            user_id=user_id,
+            browser_fingerprint=access_token.sessionId,
             chat_id=chat_id,
             text=data['message']['body'],
             timestamp=data['message']['timestamp']
         )
-
         response_data = {
             'Status': 'Created',
             'data': {
@@ -94,14 +94,12 @@ class MessageController(MessageControllerInterface):
             data: dict
         ) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         message_id = MessageUpdater.update_body(
-            user_id=user_id,
+            browser_fingerprint=access_token.sessionId,
             chat_id=chat_id,
             message_id=message_id,
             new_body=data['message']['body']
         )
-
         response_data = {
             'Status': 'Updated',
             'data': {
@@ -120,13 +118,11 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json()
     def delete(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         message_id = MessageDeleter.delete_message(
-            user_id=user_id,
+            browser_fingerprint=access_token.sessionId,
             chat_id=chat_id, 
             message_id=message_id
         )
-
         response_data = {
             'Status': 'Deleted',
             'data': {

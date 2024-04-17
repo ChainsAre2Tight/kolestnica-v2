@@ -10,12 +10,12 @@ class MessageGetterInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def list_messages(user_id: int, chat_id: int) -> list[Message]:
+    def list_messages(chat_id: int, browser_fingerprint: str) -> list[Message]:
         pass
 
     @staticmethod
     @abstractmethod
-    def get_message(user_id: int, chat_id: int, message_id: int) -> Message:
+    def get_message(chat_id: int, message_id: int, browser_fingerprint: str) -> Message:
         pass
 
 
@@ -23,7 +23,7 @@ class MessageCreatorInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_message(user_id: int, chat_id: int, text: str, timestamp: int) -> int:
+    def create_message(chat_id: int, text: str, timestamp: int, browser_fingerprint: str) -> int:
         pass
 
 
@@ -31,7 +31,7 @@ class MessageUpdaterInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def update_body(user_id: int, chat_id: int, message_id: int, new_body: str) -> int:
+    def update_body(chat_id: int, message_id: int, new_body: str, browser_fingerprint: str) -> int:
         pass
 
 
@@ -39,5 +39,5 @@ class MessageDeleterInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def delete_message(user_id: int, chat_id: int, message_id: int) -> int:
+    def delete_message(chat_id: int, message_id: int, browser_fingerprint: str) -> int:
         pass
