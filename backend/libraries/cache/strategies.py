@@ -5,13 +5,13 @@ Alivable strategies:
 - RedisCache: uses a Redis instance
 """
 
-from cache.cache_interface import CachingStrategyInterface
-from utils.exc import CacheMiss
+from libraries.cache.interfaces import CachingStrategyInterface
+from libraries.utils.exc import CacheMiss
 
 
 class DictCacheStrategy(CachingStrategyInterface):
     """Uses a Python dictionary as its storage"""
-    
+
     def __init__(self):
         self.data = dict()
 
@@ -24,7 +24,7 @@ class DictCacheStrategy(CachingStrategyInterface):
     def write_into_cache(self, key: str, value: str):
         print(f'Wrote {value} into {key}')
         self.data[key] = value
-    
+
     def delete_from_cache(self, key: str) -> None:
         try:
             self.data.pop(key)
@@ -38,7 +38,7 @@ class RedisCacheStrategy(CachingStrategyInterface):
 
     def __init__(self, redis_):
         self.r = redis_
-        
+
         if self.debug:
             print(f'---> Redis is alivable ({self.r.ping()})')
 
@@ -53,13 +53,12 @@ class RedisCacheStrategy(CachingStrategyInterface):
             if self.debug:
                 print(f'Could not read value by ({key})')
             raise CacheMiss(f'Could not find data for key "{key}"')
-    
+
     def write_into_cache(self, key: str, value: str) -> None:
         self.r.set(key, value)
         if self.debug:
             print(f'Set value ({value}) by key ({key})')
-       
-    
+
     def delete_from_cache(self, key: str) -> None:
         self.r.delete(key)
         if self.debug:
