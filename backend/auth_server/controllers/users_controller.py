@@ -18,14 +18,14 @@ class UserController(UserControllerInterface):
     @app.route('/api/auth/users/<int:user_id>', methods=['GET'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def show(access_token: Token, user_id: int) -> tuple[Response, int]:
+    def show_user(access_token: Token, user_id: int) -> tuple[Response, int]:
         raise NotImplementedError
 
     @staticmethod
     @app.route('/api/auth/users/current', methods=['GET'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def show_current(access_token: Token) -> tuple[Response, int]:
+    def show_current_user(access_token: Token) -> tuple[Response, int]:
         raise NotImplementedError
 
 
@@ -33,7 +33,7 @@ class UserController(UserControllerInterface):
     @app.route('/api/auth/users', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(data: dict) -> tuple[Response, int]:
+    def create_user(data: dict) -> tuple[Response, int]:
 
         user = UserCreator.create(
             username=data['username'],
