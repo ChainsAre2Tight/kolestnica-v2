@@ -9,7 +9,6 @@ from libraries.utils.my_dataclasses import Token, convert_dataclass_to_dict
 
 from feed_server import app
 from feed_server.controllers.interfaces import MembersControllerInterface
-from feed_server.helpers.quiries_helpers import get_user_id_by_browser_fingerprint
 from feed_server.services.members.adder import MemberAdder
 from feed_server.services.members.remover import MemberRemover
 from feed_server.services.members.lister import MemberLister
@@ -24,8 +23,10 @@ class MembersController(MembersControllerInterface):
     @json_encryptor.encrypt_json()
     def list(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
-        members = MemberLister.list_members(chat_id=chat_id, issuer_id=user_id)
+        members = MemberLister.list_members(
+            chat_id=chat_id,
+            browser_fingerprint=access_token.sessionId
+        )
 
         members_data = convert_dataclass_to_dict(members)
         response_data = {
@@ -44,11 +45,10 @@ class MembersController(MembersControllerInterface):
     @json_encryptor.encrypt_json(provide_data=True)
     def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberAdder.add_member(
             chat_id=chat_id,
-            issuer_id=user_id,
-            target_id=data['user_id']
+            target_id=data['user_id'],
+            browser_fingerprint=access_token.sessionId
         )
 
         members_data = convert_dataclass_to_dict(members)
@@ -68,11 +68,10 @@ class MembersController(MembersControllerInterface):
     @json_encryptor.encrypt_json()
     def delete(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
 
-        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         members = MemberRemover.remove_member(
             chat_id=chat_id,
-            issuer_id=user_id,
-            target_id=target_id
+            target_id=target_id,
+            browser_fingerprint=access_token.sessionId
         )
 
         members_data = convert_dataclass_to_dict(members)
