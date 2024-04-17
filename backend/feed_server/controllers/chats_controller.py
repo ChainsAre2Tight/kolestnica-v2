@@ -5,7 +5,7 @@ from flask import Response, jsonify
 
 from libraries.crypto import json_encryptor
 from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token
-from libraries.utils.my_dataclasses import Token
+from libraries.utils.my_dataclasses import Token, convert_dataclass_to_dict
 
 from feed_server import app
 from feed_server.helpers.quiries_helpers import get_user_id_by_browser_fingerprint
@@ -22,7 +22,18 @@ class ChatController(ChatControllerIntarface):
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
     def index(access_token: Token) -> tuple[Response, int]:
-        raise NotImplementedError
+
+        user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
+        chats = ChatReader.get_chats(user_id=user_id)
+        chast_data = convert_dataclass_to_dict(chats)
+
+        response_data = {
+            'Status': 'OK',
+            'data': {
+                'chats': chast_data
+            }
+        }
+        return jsonify(response_data), 200
 
 
     @staticmethod
@@ -34,7 +45,14 @@ class ChatController(ChatControllerIntarface):
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         chat = ChatReader.get_chat_data(chat_id=chat_id, user_id=user_id)
-        return jsonify(chat.__dict__), 200
+
+        response_data = {
+            'Status': 'OK',
+            'data': {
+                'chat': chat.__dict__
+            }
+        }
+        return jsonify(response_data), 200
 
 
     @staticmethod
@@ -46,7 +64,14 @@ class ChatController(ChatControllerIntarface):
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=access_token.sessionId)
         chat = ChatCreator.create(chat_name=data['name'], user_id=user_id)
-        return jsonify(chat.__dict__), 201
+
+        response_data = {
+            'Status': 'Created',
+            'data': {
+                'chat': chat.__dict__
+            }
+        }
+        return jsonify(response_data), 201
 
 
     @staticmethod

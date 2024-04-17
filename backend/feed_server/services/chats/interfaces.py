@@ -16,7 +16,12 @@ class ChatCreatorInterface(ABC):
 
 class ChatReaderInterface(ABC):
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def get_chat_data(cls, chat_id: int, user_id: int) -> Chat:
+    def get_chats(user_id: int) -> list[Chat]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def get_chat_data(chat_id: int, user_id: int) -> Chat:
         pass
