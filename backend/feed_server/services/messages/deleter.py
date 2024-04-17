@@ -6,7 +6,7 @@ from feed_server.services.messages.interfaces import MessageDeleterInterface
 from feed_server.helpers.quiries_helpers import get_chat_by_id, get_message_by_id
 import feed_server.helpers.access_helpers as access
 
-class MesageDeleter(MessageDeleterInterface):
+class MessageDeleter(MessageDeleterInterface):
 
     @staticmethod
     def delete_message(user_id: int, chat_id: int, message_id: int) -> int:
