@@ -21,7 +21,7 @@ class MembersController(MembersControllerInterface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def list(access_token: Token, chat_id: int) -> tuple[Response, int]:
+    def index_members(access_token: Token, chat_id: int) -> tuple[Response, int]:
 
         members = MemberLister.list_members(
             chat_id=chat_id,
@@ -43,7 +43,7 @@ class MembersController(MembersControllerInterface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def create(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
+    def create_member(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
         members = MemberAdder.add_member(
             chat_id=chat_id,
@@ -66,7 +66,7 @@ class MembersController(MembersControllerInterface):
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def delete(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
+    def delete_member(access_token: Token, chat_id: int, target_id: int) -> tuple[Response, int]:
 
         members = MemberRemover.remove_member(
             chat_id=chat_id,
