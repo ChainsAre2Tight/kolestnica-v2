@@ -14,8 +14,9 @@ def provide_access_token(response_data: dict, token_pair: dataclass.SignedTokenP
     if 'data' not in response_data.keys():
         response_data['data'] = {}
 
-    response_data['data']['access'] = token_pair.access
-    response_data['data']['expiry'] = token_pair.access_expiry
+    response_data['tokens'] = {'access': {}}
+    response_data['data']['tokens']['access']['value'] = token_pair.access
+    response_data['data']['tokens']['access']['expiry'] = token_pair.access_expiry
 
     return response_data
 
@@ -31,7 +32,7 @@ def provide_refresh_token(response: Response, token_pair: dataclass.SignedTokenP
             key='r',
             value=token_pair.refresh,
             httponly=True,
-            path='/auth/refresh',
+            path='/api/auth/tokens',
             expires=token_pair.refresh_expiry
         )
 

@@ -19,11 +19,21 @@ from auth_server.helpers.request_helpers import provide_access_token, provide_re
 
 class SessionController(SessionControllerInterface):
 
+
     @staticmethod
-    @app.route('/api/auth/login', methods=['POST'])
+    @app.route('/api/auth/users/current/sessions', methods=['GET'])
+    @require_access_token
+    @handle_http_exceptions
+    @json_encryptor.encrypt_json()
+    def index(access_token: Token) -> tuple[Response, int]:
+        raise NotImplementedError
+
+
+    @staticmethod
+    @app.route('/api/auth/users/current/sessions', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
-    def login_user(data: dict) -> tuple[Response, int]:
+    def create(data: dict) -> tuple[Response, int]:
         try:
             new_session = SessionCreator.create(
                 login=data['login'],
@@ -47,7 +57,12 @@ class SessionController(SessionControllerInterface):
 
         # construct response
         response_data = provide_access_token(
-            {'Status': 'Logged in', 'data': {}},
+            {
+                'Status': 'Logged in',
+                'data': {
+                    'User': '!tba!'
+                }
+            },
             token_pair=signed_token_pair
         )
         response = provide_refresh_token(
@@ -58,30 +73,21 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/auth/logout', methods=['POST'])
+    @app.route('/api/auth/users/current/sessions/current', methods=['DELETE'])
     @require_access_token
     @handle_http_exceptions
-    def logout(access_token: Token) -> tuple[Response, int]:
+    def delete_current(access_token: Token) -> tuple[Response, int]:
 
         SessionDeleter.delete(browser_fingerprint=access_token.sessionId)
-        payload = {
+        response_data = {
             'Status': 'Deleted',
             'Details': 'Session successfully terminated'
         }
 
-        response = make_response(jsonify(payload))
+        response = make_response(jsonify(response_data))
         response.delete_cookie(
             key='r',
             httponly=True,
-            path='/auth/refresh',
+            path='/api/auth/tokens',
         )
         return response, 200
-
-
-    @staticmethod
-    @app.route('/api/auth/account/sessions', methods=['GET'])
-    @require_access_token
-    @handle_http_exceptions
-    @json_encryptor.encrypt_json()
-    def list_sessions(access_token: Token) -> tuple[Response, int]:
-        raise NotImplementedError

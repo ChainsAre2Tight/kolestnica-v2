@@ -18,11 +18,11 @@ from auth_server.helpers.request_helpers import provide_access_token, provide_re
 class TokenController(TokenControllerInterface):
 
     @staticmethod
-    @app.route('/api/auth/refresh-tokens', methods=['POST'])
+    @app.route('/api/auth/tokens', methods=['GET'])
     @require_refresh_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
-    def refresh_tokens(raw_token: str, refresh_token: Token) -> tuple[Response, int]:
+    def refresh(raw_token: str, refresh_token: Token) -> tuple[Response, int]:
         # find session by refresh token
         session = SessionReader.read(browser_fingerprint=refresh_token.sessionId)
 

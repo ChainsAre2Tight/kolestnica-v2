@@ -11,7 +11,17 @@ class UserControllerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def register_user(data: dict) -> tuple[Response, int]:
+    def show(access_token: Token, user_id: int) -> tuple[Response, int]:
+        """Gets info of a certain user"""
+
+    @staticmethod
+    @abstractmethod
+    def show_current(access_token: Token) -> tuple[Response, int]:
+        """Gets current user's data"""
+
+    @staticmethod
+    @abstractmethod
+    def create(data: dict) -> tuple[Response, int]:
         """Registers user"""
 
 
@@ -19,25 +29,25 @@ class SessionControllerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def login_user(data: dict) -> tuple[Response, int]:
+    def index(access_token: Token) -> tuple[Response, int]:
+        """Lists all currently active sessions of this user"""
+
+    @staticmethod
+    @abstractmethod
+    def create(data: dict) -> tuple[Response, int]:
         """Logs user in"""
 
     @staticmethod
     @abstractmethod
-    def logout(access_token: Token) -> tuple[Response, int]:
+    def delete_current(access_token: Token) -> tuple[Response, int]:
         """Logs user out"""
-
-    @staticmethod
-    @abstractmethod
-    def list_sessions(access_token: Token) -> tuple[Response, int]:
-        """Lists all currently active sessions of this user"""
 
 
 class TokenControllerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def refresh_tokens(
+    def refresh(
             raw_token: str,
             refresh_token: Token
         ) -> tuple[Response, int]:
