@@ -27,6 +27,14 @@ class MessageCreatorInterface(ABC):
         pass
 
 
+class MessageUpdaterInterface(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def update_body(user_id: int, chat_id: int, message_id: int, new_body: str) -> int:
+        pass
+
+
 class MessageDeleterInterface(ABC):
 
     @staticmethod
