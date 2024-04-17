@@ -6,11 +6,14 @@ from functools import wraps
 from flask import request, Response
 from typing_extensions import Callable
 
-from libraries.utils.exc import BadEncryptionKeys
+from utils.exc import BadEncryptionKeys
+from utils.decorators import singleton
 
-import libraries.crypto.strategies as strategy
-import libraries.crypto.interfaces as interface
+import crypto.strategies as strategy
+import crypto.interfaces as interface
 
+
+@singleton
 class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
 
     def __init__(self, encryption_strategy: strategy.EncryptionStrategyInterface) -> None:

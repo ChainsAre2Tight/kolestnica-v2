@@ -5,10 +5,13 @@ import os
 
 from utils.wrapper_checks import check_for_keyword_in_kwargs
 from utils.exc import CacheMiss
+from utils.decorators import singleton
+
 import cache.interfaces as interface
 import cache.strategies as strategy
 
 
+@singleton
 class CacheController(interface.CacheControllerInterface):
     """Provides decorators for cache interactions"""
 

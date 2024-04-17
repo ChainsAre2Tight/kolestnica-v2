@@ -3,11 +3,14 @@
 import os
 from functools import wraps
 
-from libraries.utils.wrapper_checks import check_for_keyword_in_kwargs
+from utils.wrapper_checks import check_for_keyword_in_kwargs
+from utils.decorators import singleton
 
-import libraries.crypto.interfaces as interface
-import libraries.crypto.strategies as strategy
+import crypto.interfaces as interface
+import crypto.strategies as strategy
 
+
+@singleton
 class TokenEncryptionController(interface.TokenEncryptionControllerInterface):
 
     def __init__(self, encryption: interface.EncryptionStrategyInterface):
