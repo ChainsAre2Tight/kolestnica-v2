@@ -1,0 +1,6 @@
+celery
+flask
+flask_socketio
+pyjwt
+qunicorn
+eventlet

@@ -9,6 +9,7 @@ services:
     depends_on:
       - auth
       - feed
+      - notification
     
   auth:
     build: ./services/user
@@ -23,7 +24,7 @@ services:
     env_file:
       - ./services/user/.env.dev
     depends_on:
-      - db-manager
+      - seeder
       - db
   
   feed:
@@ -39,11 +40,26 @@ services:
     env_file:
       - ./services/feed/.env.dev
     depends_on:
-      - db-manager
+      - seeder
       - db
       - auth
   
-  db-manager:
+  notification:
+    build: ./services/notification
+    # command: gunicorn --bind 0.0.0.0:5030 --worker-class eventlet -w 1 manage:app # gunicorn
+    command: python manage.py # flask_socketio
+    volumes:
+      - ./backend/:/usr/src/app/application
+    expose:
+      - 5030
+    env_file:
+      - ./services/notification/.env.dev
+    depends_on:
+      - seeder
+      - auth
+      - redis
+  
+  seeder:
     build: ./services/database-manager
     command: python manage.py seed_db
     volumes:
