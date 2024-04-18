@@ -3,11 +3,11 @@
 
 from abc import ABC, abstractmethod
 
-from libraries.utils.my_dataclasses import CurrentUser, Session
+from libraries.utils.my_dataclasses import CurrentUser
 
 
 class UserReaderInterface(ABC):
-    
+
     @staticmethod
     @abstractmethod
     def index_chats(browser_fingerprint: str) -> list[int]:
