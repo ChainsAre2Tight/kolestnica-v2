@@ -97,8 +97,9 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @require_api_key
     @app.route('/api/users/current/sessions/current', methods=['PATCH'])
+    @require_api_key
+    @handle_http_exceptions
     def update_current_session(data: dict) -> tuple[Response, int]:
 
         SessionUpdator.update_socket_id(

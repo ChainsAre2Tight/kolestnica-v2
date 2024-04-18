@@ -22,4 +22,10 @@ class SessionUpdator(SessionUpdaterIntarface):
 
     @staticmethod
     def update_socket_id(browser_fingerprint: str, new_socket_id: str) -> None:
-        pass
+        try:
+            session = find_session_by_fingerprint(browser_fingerprint=browser_fingerprint)
+        except SessionNotFound as e:
+            raise SessionNotFound from e
+
+        session.socketId = new_socket_id
+        db.session.commit()
