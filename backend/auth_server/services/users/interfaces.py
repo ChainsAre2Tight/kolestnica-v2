@@ -7,10 +7,10 @@ from libraries.utils.my_dataclasses import CurrentUser, Session
 
 
 class UserReaderInterface(ABC):
-
+    
     @staticmethod
     @abstractmethod
-    def get_sessions(user_id) -> list[Session]:
+    def index_chats(browser_fingerprint: str) -> list[int]:
         pass
 
 
