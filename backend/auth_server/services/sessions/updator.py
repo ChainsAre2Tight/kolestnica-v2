@@ -21,5 +21,5 @@ class SessionUpdator(SessionUpdaterIntarface):
         db.session.commit()
 
     @staticmethod
-    def update_socket_id(session_id: int, new_socker_id: str) -> None:
-        raise NotImplementedError('Socket id updator is yet to be implemented')
+    def update_socket_id(browser_fingerprint: str, new_socket_id: str) -> None:
+        pass

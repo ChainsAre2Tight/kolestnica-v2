@@ -14,7 +14,10 @@ from auth_server.services.sessions.creator import SessionCreator
 from auth_server.services.sessions.deleter import SessionDeleter
 from auth_server.services.sessions.updator import SessionUpdator
 from auth_server.services.tokens.creator import TokenPairCreator
+from auth_server.services.users.reader import UserReader
 from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
+from auth_server.helpers.decorators import require_api_key
+
 
 
 class SessionController(SessionControllerInterface):
@@ -91,3 +94,22 @@ class SessionController(SessionControllerInterface):
             path='/api/auth/tokens',
         )
         return response, 200
+
+
+    @staticmethod
+    @require_api_key
+    @app.route('/api/users/current/sessions/current', methods=['PATCH'])
+    def update_current_session(data: dict) -> tuple[Response, int]:
+
+        SessionUpdator.update_socket_id(
+            browser_fingerprint=data['session_id'],
+            new_socket_id=data['socket_id']
+        )
+        chats = UserReader.index_chats(browser_fingerprint=data['session_id'])
+        response_data = {
+            'Status': 'Updated',
+            'data': {
+                'chats': chats
+            }
+        }
+        return jsonify(response_data), 200

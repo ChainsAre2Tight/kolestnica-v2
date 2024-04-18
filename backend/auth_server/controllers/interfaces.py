@@ -42,6 +42,11 @@ class SessionControllerInterface(ABC):
     def delete_current_session(access_token: Token) -> tuple[Response, int]:
         """Logs user out"""
 
+    @staticmethod
+    @abstractmethod
+    def update_current_session(data: dict) -> tuple[Response, int]:
+        """Updates user session with new socket id. For internal use only"""
+
 
 class TokenControllerInterface(ABC):
 
