@@ -1,5 +1,6 @@
 """Defines SQLAlchemy models used in this project"""
 
+
 from typing import List
 
 from sqlalchemy import ForeignKey
@@ -9,7 +10,8 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from . import db
+from database import db
+
 
 User_Chats = Table(
     "user_chats",

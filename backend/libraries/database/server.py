@@ -1,5 +1,8 @@
+"""Provides seeder server"""
+
+
 from flask import Flask
-from libraries.database import db
+from database import db
 import os
 
 app = Flask('database manager')

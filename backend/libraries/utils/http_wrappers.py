@@ -8,8 +8,8 @@ import json
 import jwt
 from flask import Response, make_response, request, jsonify
 
-from libraries.utils import exc
-from libraries.utils.my_dataclasses import Token
+from utils import exc
+from utils.my_dataclasses import Token
 
 def decode_token(raw_token: str) -> Token:
     return Token(**jwt.decode(

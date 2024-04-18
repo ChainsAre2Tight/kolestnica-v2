@@ -6,8 +6,8 @@ from functools import wraps
 from flask import request, Response
 from typing_extensions import Callable
 
-from utils.exc import BadEncryptionKeys
-from utils.decorators import singleton
+from libraries.utils.exc import BadEncryptionKeys
+from libraries.utils.decorators import singleton
 
 import crypto.strategies as strategy
 import crypto.interfaces as interface

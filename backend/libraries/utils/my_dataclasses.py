@@ -1,3 +1,6 @@
+"""Provides various dataclasses used throught this project"""
+
+
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing_extensions import Literal

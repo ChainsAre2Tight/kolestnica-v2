@@ -8,7 +8,8 @@ Alivable strategies:
 """
 
 from libraries.utils.exc import BadEncryptionKeys
-from libraries.crypto.interfaces import EncryptionStrategyInterface
+
+from crypto.interfaces import EncryptionStrategyInterface
 
 
 class IdleEncryptionStrategy(EncryptionStrategyInterface):

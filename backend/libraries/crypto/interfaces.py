@@ -1,4 +1,6 @@
 """Provides interfaces for cryptography objetcs"""
+
+
 from abc import ABC, abstractmethod
 from typing_extensions import Callable
 

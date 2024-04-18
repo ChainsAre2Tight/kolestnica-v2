@@ -3,9 +3,9 @@
 from typing import Callable
 import os
 
-from utils.wrapper_checks import check_for_keyword_in_kwargs
-from utils.exc import CacheMiss
-from utils.decorators import singleton
+from libraries.utils.wrapper_checks import check_for_keyword_in_kwargs
+from libraries.utils.exc import CacheMiss
+from libraries.utils.decorators import singleton
 
 import cache.interfaces as interface
 import cache.strategies as strategy
