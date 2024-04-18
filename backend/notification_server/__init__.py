@@ -10,6 +10,7 @@ from flask_socketio import SocketIO
 
 # flask
 app = Flask('Notification server')
+app.config['SECRET_KEY'] = os.environ.get('FLASK-SECRET-KEY')
 
 
 # socketio
