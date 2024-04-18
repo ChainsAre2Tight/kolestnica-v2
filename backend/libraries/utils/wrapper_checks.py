@@ -1,7 +1,7 @@
 """Provides wrapper check functions"""
 
 
-from utils.exc import WrappedFunctionMissingKeyword
+from libraries.utils.exc import WrappedFunctionMissingKeyword
 
 def check_for_keyword_in_kwargs(kwargs: dict, keyword: str, func_name: str) -> None:
     if not keyword in kwargs.keys():

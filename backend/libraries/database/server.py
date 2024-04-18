@@ -2,7 +2,7 @@
 
 
 from flask import Flask
-from database import db
+from libraries.database import db
 import os
 
 app = Flask('database manager')

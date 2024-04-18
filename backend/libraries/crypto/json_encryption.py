@@ -9,15 +9,15 @@ from typing_extensions import Callable
 from libraries.utils.exc import BadEncryptionKeys
 from libraries.utils.decorators import singleton
 
-import crypto.strategies as strategy
-import crypto.interfaces as interface
+import libraries.crypto.strategies as strategy
+import libraries.crypto.interfaces as interface
 
 
-@singleton
 class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
 
     def __init__(self, encryption_strategy: strategy.EncryptionStrategyInterface) -> None:
         self._encryption_strategy = encryption_strategy
+        print('I am a json encryption controller instance', self)
 
     @staticmethod
     def build():

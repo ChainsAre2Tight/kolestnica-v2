@@ -7,16 +7,16 @@ from libraries.utils.wrapper_checks import check_for_keyword_in_kwargs
 from libraries.utils.exc import CacheMiss
 from libraries.utils.decorators import singleton
 
-import cache.interfaces as interface
-import cache.strategies as strategy
+import libraries.cache.interfaces as interface
+import libraries.cache.strategies as strategy
 
 
-@singleton
 class CacheController(interface.CacheControllerInterface):
     """Provides logic for cache interactions"""
 
     def __init__(self, cache_strategy: interface.CachingStrategyInterface):
         self._cache_strategy = cache_strategy
+        print('I am a cache controller instance', self)
 
     def read_through_cache(self, keyword: str, type_: type):
         def wrapper(func):

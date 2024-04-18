@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from database import db
+from libraries.database import db
 
 
 User_Chats = Table(

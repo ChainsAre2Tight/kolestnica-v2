@@ -1,7 +1,7 @@
 """Provides cache controller"""
 
 
-from cache.controller import CacheController
+from libraries.cache.controller import CacheController
 
 
 cache_controller = CacheController.build()
