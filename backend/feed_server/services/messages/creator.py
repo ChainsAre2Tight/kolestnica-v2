@@ -3,7 +3,7 @@
 
 from libraries.database.models import Message
 
-from feed_server import db
+from feed_server import db, celery
 from feed_server.services.messages.interfaces import MessageCreatorInterface
 from feed_server.helpers.quiries_helpers import get_chat_by_id, get_user_id_by_browser_fingerprint
 from feed_server.helpers.access_helpers import verify_user_in_chat
@@ -33,4 +33,10 @@ class MessageCreator(MessageCreatorInterface):
         db.session.add(message)
         db.session.commit()
 
+        MessageCreator._notify(chat_id=chat_id, message_id=message.id)
+
         return message.id
+
+    @staticmethod
+    def _notify(chat_id: int, message_id: int) -> None:
+        celery.send_task('tasks.add_message', (chat_id, message_id))

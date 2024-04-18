@@ -1,7 +1,7 @@
 """Contains an object that can delete messages"""
 
 
-from feed_server import db
+from feed_server import db, celery
 from feed_server.services.messages.interfaces import MessageDeleterInterface
 import feed_server.helpers.quiries_helpers as quiry
 import feed_server.helpers.access_helpers as access
@@ -26,4 +26,9 @@ class MessageDeleter(MessageDeleterInterface):
         db.session.remove(message)
         db.session.commit()
 
+        MessageDeleter._notify(chat_id=chat_id, message_id=message_id)
         return message.id
+
+    @staticmethod
+    def _notify(chat_id: int, message_id: int) -> None:
+        celery.send_task('tasks.delete_message', (chat_id, message_id))

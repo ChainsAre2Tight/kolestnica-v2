@@ -4,7 +4,7 @@
 from libraries.utils.my_dataclasses import Chat
 from libraries.database import models
 
-from feed_server import db
+from feed_server import db, celery
 from feed_server.services.chats.interfaces import ChatCreatorInterface
 import feed_server.helpers.quiries_helpers as quiry
 
@@ -13,13 +13,20 @@ class ChatCreator(ChatCreatorInterface):
 
     @classmethod
     def create(cls, chat_name: str, browser_fingerprint: str) -> Chat:
+
+        # get data
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
         user = quiry.get_user_by_id(user_id=user_id)
+
+        # create model
         chat = cls._construct(chat_name=chat_name, user=user)
         db.session.add(chat)
         db.session.commit()
-
         chat_data = Chat.from_model(chat)
+
+        # send task to notification server
+        ChatCreator._notify(user=user, chat_id=chat.id)
+
         return chat_data
 
     @staticmethod
@@ -30,3 +37,8 @@ class ChatCreator(ChatCreatorInterface):
             users=[user]
         )
         return chat
+
+    @staticmethod
+    def _notify(user: models.User, chat_id: int) -> None:
+        for session in user.sessions:
+            celery.send_task('tasks.create_chat', (session.socketId, chat_id))

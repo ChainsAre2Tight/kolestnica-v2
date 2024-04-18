@@ -1,4 +1,4 @@
-
+"""Provides tasks for notification server"""
 
 
 from notification_server import socket, celery
@@ -11,11 +11,11 @@ def create_chat(sid: str, chat_id: int):
     RoomController.add_user_to_rooms(sid=sid, rooms=[chat_id])
 
 @celery.task
-def update_chat(chat_id: int):
+def update_chat(chat_id: int):  # Unused as it lacks interactor
     socket.emit('update-chat', data={'chat_id': chat_id}, to=chat_id)
 
 @celery.task
-def delete_chat(chat_id: int):
+def delete_chat(chat_id: int):  # Unused as it lacks interactor
     socket.emit('drop-chat', data={'chat_id': chat_id}, to=chat_id)
     RoomController.remove_room(room=chat_id)
 

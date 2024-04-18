@@ -1,7 +1,7 @@
 """Provides object that can update messages"""
 
 
-from feed_server import db
+from feed_server import db, celery
 from feed_server.services.messages.interfaces import MessageUpdaterInterface
 import feed_server.helpers.quiries_helpers as quiry
 import feed_server.helpers.access_helpers as access
@@ -28,4 +28,10 @@ class MessageUpdater(MessageUpdaterInterface):
         message.body = new_body
         db.session.commit()
 
+        MessageUpdater._notify(chat_id=chat_id, message_id=message_id)
+
         return message.id
+
+    @staticmethod
+    def _notify(chat_id: int, message_id: int) -> None:
+        celery.send_task('tasks.update_message', (chat_id, message_id))
