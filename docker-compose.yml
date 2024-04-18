@@ -4,6 +4,7 @@ services:
 
   nginx:
     build: ./services/nginx
+    restart: unless-stopped
     ports:
       - 1337:80
     depends_on:
@@ -13,6 +14,7 @@ services:
     
   auth:
     build: ./services/user
+    restart: unless-stopped
     # command: gunicorn --bind 0.0.0.0:5020 manage:app # gunicorn
     command: python manage.py run -h 0.0.0.0 -p 5020 # flask
     volumes:
@@ -29,6 +31,7 @@ services:
   
   feed:
     build: ./services/feed
+    restart: unless-stopped
     # command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
     command: python manage.py run -h 0.0.0.0 -p 5010 # flask
     volumes:
@@ -47,6 +50,7 @@ services:
   notification:
     build: ./services/notification
     # command: gunicorn --bind 0.0.0.0:5030 --worker-class eventlet -w 1 manage:app # gunicorn
+    restart: unless-stopped
     command: python manage.py # flask_socketio
     volumes:
       - ./backend/:/usr/src/app/application
@@ -76,7 +80,7 @@ services:
   
   redis:
     image: redis:latest
-    restart: always
+    restart: unless-stopped
     expose:
       - 6379
     volumes:
@@ -93,7 +97,7 @@ services:
   
   db:
     image: mysql:8
-    restart: always
+    restart: unless-stopped
     expose:
       - 3307
     ports:

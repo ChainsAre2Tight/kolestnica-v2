@@ -2,5 +2,5 @@ celery
 flask
 flask_socketio
 pyjwt
-qunicorn
+gunicorn==22.0.0
 eventlet
