@@ -36,4 +36,5 @@ class MemberRemover(MemberRemoverInterface):
     @staticmethod
     def _notify(user: User, chat_id: int) -> None:
         for session in user.sessions:
-            celery.send_task('tasks.remove_from_chat', (session.socketId, chat_id))
+            if session.socketId is not None:
+                celery.send_task('tasks.remove_from_chat', (session.socketId, chat_id))

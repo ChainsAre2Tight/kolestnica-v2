@@ -37,4 +37,5 @@ class MemberAdder(MemberAdderInterface):
     @staticmethod
     def _notify(user: User, chat_id: int) -> None:
         for session in user.sessions:
-            celery.send_task('tasks.add_to_chat', (session.socketId, chat_id))
+            if session.socketId is not None:
+                celery.send_task('tasks.add_to_chat', (session.socketId, chat_id))
