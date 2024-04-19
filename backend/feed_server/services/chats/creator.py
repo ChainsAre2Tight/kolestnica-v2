@@ -30,11 +30,17 @@ class ChatCreator(ChatCreatorInterface):
         return chat_data
 
     @staticmethod
+    def _generate_key() -> str:
+        # some keygen shenanigans
+        return 'secretchatencryptionkey'
+
+    @staticmethod
     def _construct(chat_name, user: models.User) -> models.Chat:
         chat = models.Chat(
             name=chat_name,
             messages=[],
-            users=[user]
+            users=[user],
+            encryption_key=ChatCreator._generate_key()
         )
         return chat
 
