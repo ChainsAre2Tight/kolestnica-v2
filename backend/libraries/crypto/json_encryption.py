@@ -3,11 +3,11 @@
 import os
 import json
 from functools import wraps
-from flask import request, Response
 from typing_extensions import Callable
 
+from flask import request, Response
+
 from libraries.utils.exc import BadEncryptionKeys
-from libraries.utils.decorators import singleton
 
 import libraries.crypto.strategies as strategy
 import libraries.crypto.interfaces as interface
@@ -15,12 +15,17 @@ import libraries.crypto.interfaces as interface
 
 class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
 
-    def __init__(self, encryption_strategy: strategy.EncryptionStrategyInterface) -> None:
+    def __init__(
+            self,
+            encryption_strategy: strategy.EncryptionStrategyInterface,
+            decryption_key: str | int,
+        ) -> None:
         self._encryption_strategy = encryption_strategy
-        print('I am a json encryption controller instance', self)
+        self._decryption_key = decryption_key
 
     @staticmethod
     def build():
+        decryption_key = os.environ.get('JSON_PRIVATE_KEY')
         match os.environ.get('JSON_ENCRYPTION_STRATEGY'):
             case 'REVERSE':
                 encryption = strategy.ReverseEncryptionStrategy
@@ -28,20 +33,22 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                 encryption = strategy.CaesarEncryptionStrategy
             case _:
                 encryption = strategy.IdleEncryptionStrategy
-        return JSONEncryptionController(encryption_strategy=encryption)
+        return JSONEncryptionController(
+                encryption_strategy=encryption,
+                decryption_key=decryption_key
+            )
 
     def encrypt_json(self, provide_data: bool = False) -> Callable:
         def json_wrapper(func):
             @wraps(func)
             def json_decorated_function(*args, **kwargs):
-                key: None | int | str | tuple[int, int] = None
+                client_public_key: None | int | str | tuple[int, int] = None
 
                 # if encryption requires key, check if being provided in request headers
                 if self._encryption_strategy.key_format is not None:
                     try:
-                        raw_key = request.headers['enc-key']
-                        key = self._encryption_strategy.format_key(raw_key)
-                        print('key is', key)
+                        raw_key = request.headers['public-key']
+                        client_public_key = self._encryption_strategy.format_key(raw_key)
                     except KeyError:
                         raise BadEncryptionKeys('Encryption key is missing')
 
@@ -52,7 +59,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                     encrypted_request_data = request.get_json()
                     decrypted_request_data = self._decrypt_dict(
                         dictionary=encrypted_request_data,
-                        decryption_key=key
+                        decryption_key=self._decryption_key
                     )
 
                     kwargs['data'] = decrypted_request_data
@@ -67,7 +74,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                 data = response.get_json()
                 encrypted_response_data = self._encrypt_dict(
                     dictionary=data,
-                    encryption_key=key
+                    encryption_key=client_public_key
                 )
                 response.data = json.dumps(encrypted_response_data)
 

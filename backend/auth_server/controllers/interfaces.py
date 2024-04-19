@@ -7,6 +7,14 @@ from flask import Response
 from libraries.utils.my_dataclasses import Token
 
 
+class KeyControllerInterface(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def show_public_key() -> tuple[Response, int]:
+        """Sends user auth server public key"""
+
+
 class UserControllerInterface(ABC):
 
     @staticmethod

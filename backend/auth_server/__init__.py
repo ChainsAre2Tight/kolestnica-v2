@@ -29,8 +29,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 
-# miscellaneous
-api_key = os.environ.get('API_KEY') or 'secret-api-key'
+# encryption public key
+public_key = os.environ.get('JSON_PUBLIC_KEY')
 
 
-from auth_server.controllers import sessions_controller, tokens_controller, users_controller
+
+from auth_server.controllers import sessions_controller, tokens_controller, users_controller, keys_controller
