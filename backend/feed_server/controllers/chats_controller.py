@@ -4,13 +4,14 @@
 from flask import Response, jsonify
 
 from libraries.crypto import json_encryptor
+from libraries.utils.my_dataclasses import Token
 from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token
-from libraries.utils.my_dataclasses import Token, convert_dataclass_to_dict
 
 from feed_server import app
 from feed_server.controllers.interfaces import ChatControllerIntarface
 from feed_server.services.chats.creator import ChatCreator
 from feed_server.services.chats.reader import ChatReader
+from feed_server.services.chats.serializer import ChatSerializer
 
 
 class ChatController(ChatControllerIntarface):
@@ -23,12 +24,11 @@ class ChatController(ChatControllerIntarface):
     def index_chats(access_token: Token) -> tuple[Response, int]:
 
         chats = ChatReader.get_chats(browser_fingerprint=access_token.sessionId)
-        chats_data = convert_dataclass_to_dict(chats)
 
         response_data = {
             'Status': 'OK',
             'data': {
-                'chats': chats_data
+                'chats': ChatSerializer.to_ids(chats=chats)
             }
         }
         return jsonify(response_data), 200
@@ -45,7 +45,7 @@ class ChatController(ChatControllerIntarface):
         response_data = {
             'Status': 'OK',
             'data': {
-                'chat': chat.__dict__
+                'chat': ChatSerializer.full(chat=chat)
             }
         }
         return jsonify(response_data), 200
@@ -65,7 +65,7 @@ class ChatController(ChatControllerIntarface):
         response_data = {
             'Status': 'Created',
             'data': {
-                'chat': chat.__dict__
+                'chat': ChatSerializer.full(chat=chat)
             }
         }
         return jsonify(response_data), 201

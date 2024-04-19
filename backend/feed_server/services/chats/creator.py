@@ -1,7 +1,6 @@
 """Provides chat creator class"""
 
 
-from libraries.utils.my_dataclasses import Chat
 from libraries.database import models
 
 from feed_server import db, celery
@@ -12,7 +11,7 @@ import feed_server.helpers.quiries_helpers as quiry
 class ChatCreator(ChatCreatorInterface):
 
     @classmethod
-    def create(cls, chat_name: str, browser_fingerprint: str) -> Chat:
+    def create(cls, chat_name: str, browser_fingerprint: str) -> models.Chat:
 
         # get data
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
@@ -22,12 +21,11 @@ class ChatCreator(ChatCreatorInterface):
         chat = cls._construct(chat_name=chat_name, user=user)
         db.session.add(chat)
         db.session.commit()
-        chat_data = Chat.from_model(chat)
 
         # send task to notification server
         ChatCreator._notify(user=user, chat_id=chat.id)
 
-        return chat_data
+        return chat
 
     @staticmethod
     def _generate_key() -> str:
