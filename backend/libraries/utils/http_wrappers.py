@@ -33,12 +33,12 @@ def require_access_token(func: Callable) -> tuple[Response, int] | Callable:
             access_token: Token = decode_token(raw_token=raw_token)
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
             return jsonify({
-                'Staus': 'Error',
+                'Status': 'Error',
                 'details': 'Access token is missing or is invalid'
             }), 401
         except jwt.ExpiredSignatureError:
             return jsonify({
-                'Staus': 'Error',
+                'Status': 'Error',
                 'details': 'Access token is expired'
             }), 403
         kwargs['access_token'] = access_token
@@ -62,12 +62,12 @@ data to decorated function
             decoded_token: Token = decode_token(raw_token=raw_token)
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError, json.JSONDecodeError):
             return jsonify({
-                'Staus': 'Error',
+                'Status': 'Error',
                 'details': 'Refresh token is missing or is invalid'
             }), 401
         except jwt.ExpiredSignatureError:
             return jsonify({
-                'Staus': 'Error',
+                'Status': 'Error',
                 'details': 'Refresh token is expired'
             }), 403
 
@@ -114,7 +114,7 @@ def handle_http_exceptions(func: Callable) -> Callable | tuple[Response, int]:
         except exc.DuplicateLoginException as e:
             return make_err_response('An account assosiated with this login already exists', e), 409
         except exc.DuplicateUsernameException as e:
-            return make_err_response('This username was already taken by another user', e), 406
+            return make_err_response('This username was already taken by another user', e), 409
         except exc.InvalidLoginData as e:
             return make_err_response('Invalid login or password', e), 404
         except exc.SessionNotFound as e:

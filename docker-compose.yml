@@ -65,7 +65,7 @@ services:
   
   seeder:
     build: ./services/database-manager
-    command: python manage.py seed_db
+    command: python manage.py verify_db
     volumes:
       - ./backend/:/usr/src/app/application
     environment:

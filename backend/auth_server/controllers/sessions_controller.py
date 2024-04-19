@@ -17,6 +17,7 @@ from auth_server.services.tokens.creator import TokenPairCreator
 from auth_server.services.users.reader import UserReader
 from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
 from auth_server.helpers.decorators import require_api_key
+from auth_server.services.users.serializer import UserSerializer
 
 
 
@@ -24,7 +25,7 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/users/current/sessions', methods=['GET'])
+    @app.route('/api/users/current/sessions/', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -33,7 +34,7 @@ class SessionController(SessionControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/users/current/sessions', methods=['POST'])
+    @app.route('/api/users/current/sessions/', methods=['POST'])
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
     def create_session(data: dict) -> tuple[Response, int]:
@@ -63,7 +64,7 @@ class SessionController(SessionControllerInterface):
             {
                 'Status': 'Logged in',
                 'data': {
-                    'User': '!tba!'
+                    'User': UserSerializer.full(new_session.user)
                 }
             },
             token_pair=signed_token_pair
@@ -91,7 +92,7 @@ class SessionController(SessionControllerInterface):
         response.delete_cookie(
             key='r',
             httponly=True,
-            path='/api/auth/tokens',
+            path='/api/tokens',
         )
         return response, 200
 

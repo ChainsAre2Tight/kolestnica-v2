@@ -1,7 +1,7 @@
 """Contains session reader"""
 
 
-from libraries.utils.my_dataclasses import Session
+from libraries.database.models import Session
 from libraries.utils.exc import SessionNotFound
 
 from auth_server.services.sessions.interfaces import SessionReaderIntarface
@@ -17,5 +17,4 @@ class SessionReader(SessionReaderIntarface):
         except SessionNotFound as e:
             raise SessionNotFound from e
 
-        session_data = Session.from_model(session)
-        return session_data
+        return session

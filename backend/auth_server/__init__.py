@@ -31,6 +31,7 @@ db.init_app(app)
 
 # encryption public key
 public_key = os.environ.get('JSON_PUBLIC_KEY')
+api_key = os.environ.get('API_KEY')
 
 
 

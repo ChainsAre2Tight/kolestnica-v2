@@ -62,7 +62,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                         decryption_key=self._decryption_key
                     )
 
-                    kwargs['data'] = decrypted_request_data
+                    kwargs['data'] = decrypted_request_data # decrypted_request_data
 
                 # execute decorated function
                 response: Response
@@ -88,6 +88,9 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
             encryption_key: None | int | str | tuple[int, int]
         ) -> dict | list:
 
+        if isinstance(self._encryption_strategy, strategy.IdleEncryptionStrategy):
+            return dictionary
+
         return self._recursively_perform_action(
             iterable=dictionary,
             action=self._encryption_strategy.encrypt_message,
@@ -99,6 +102,9 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
             dictionary: dict | list,
             decryption_key: None | int | str | tuple[int, int]
         ) -> dict | list:
+
+        if isinstance(self._encryption_strategy, strategy.IdleEncryptionStrategy):
+            return dictionary
 
         return self._recursively_perform_action(
             iterable=dictionary,
