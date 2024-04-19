@@ -3,7 +3,6 @@
 from sqlalchemy.exc import IntegrityError
 
 from libraries.cache import cache_controller
-from libraries.utils.my_dataclasses import Session as d_Session
 from libraries.utils.exc import InvalidLoginData, AlreadyLoggedIn, UserNotFound
 from libraries.database.models import User, UserLogin, Session
 
@@ -15,15 +14,12 @@ from auth_server.helpers.queries_helpers import find_user_login_by_login
 class SessionCreator(SessionCreatorInterface):
 
     @staticmethod
-    def create(login: str, pwdh: str, browser_fingerprint: str) -> d_Session:
+    def create(login: str, pwdh: str, browser_fingerprint: str) -> Session:
         user = SessionCreator._login(login=login, pwdh=pwdh)
         session = SessionCreator._create_session(user=user, browser_fingerprint=browser_fingerprint)
-
-        session_data = d_Session.from_model(session)
-
         cache_controller.write_into_cache(session.uuid, user.id)
 
-        return session_data
+        return session
 
 
     @staticmethod
