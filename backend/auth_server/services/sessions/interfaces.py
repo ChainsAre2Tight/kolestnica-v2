@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from libraries.utils.my_dataclasses import Session
+from libraries.database.models import Session
 
 
 class SessionReaderIntarface(ABC):
@@ -69,3 +69,16 @@ class SessionDeleterInterface(ABC):
 
         :raises SessionNotFound: if session with provided data cannot be found
         """
+
+
+class SessionSerializerInterface(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def full(session: Session) -> dict:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def full_list(sessions: list[Session]) -> list[Session]:
+        pass

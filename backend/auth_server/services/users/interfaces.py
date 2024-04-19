@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 
-from libraries.utils.my_dataclasses import CurrentUser
+from libraries.database.models import User
 
 
 class UserReaderInterface(ABC):
@@ -22,7 +22,7 @@ class UserCreatorIntarface(ABC):
             username: str,
             login: str,
             pwdh: str
-        ) -> CurrentUser:
+        ) -> User:
         """Attempts to create a user with provided username, login and password hash and returns \
             his data if successful
         
@@ -30,10 +30,23 @@ class UserCreatorIntarface(ABC):
         :params str login: unique login credential (email)
         :params str pwdh: MD5 hash of user's password
 
-        :returns: dataclass containing all relevant data of the user
+        :returns: User
 
         :raises:
             DuplicateLoginException: if there already is an account associated with \
                 this login (email)
             DuplicateUsernameException: if there already is an account with specified username
         """
+
+
+class UserSerializatorInterface(ABC):
+
+    @staticmethod
+    @abstractmethod
+    def to_id(user: User) -> int:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def full(user: User) -> dict:
+        pass
