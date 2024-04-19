@@ -3,7 +3,7 @@
 
 from flask import Response, jsonify
 
-from libraries.utils.my_dataclasses import Token, convert_dataclass_to_dict
+from libraries.utils.my_dataclasses import Token
 from libraries.utils.http_wrappers import require_access_token, handle_http_exceptions
 from libraries.crypto import json_encryptor
 
@@ -13,6 +13,7 @@ from feed_server.services.messages.getter import MessageGetter
 from feed_server.services.messages.creator import MessageCreator
 from feed_server.services.messages.updater import MessageUpdater
 from feed_server.services.messages.deleter import MessageDeleter
+from feed_server.services.messages.serializer import MessageSerializer
 
 
 class MessageController(MessageControllerInterface):
@@ -28,11 +29,11 @@ class MessageController(MessageControllerInterface):
             chat_id=chat_id,
             browser_fingerprint=access_token.sessionId
         )
-        messages_data = convert_dataclass_to_dict(messages)
         response_data = {
             'Status': 'OK',
             'data': {
-                'messages': messages_data
+                'chat_id': chat_id,
+                'messages': MessageSerializer.full_list(messages=messages)
             }
         }
         return jsonify(response_data), 200
@@ -52,7 +53,8 @@ class MessageController(MessageControllerInterface):
         response_data = {
             'Status': 'OK',
             'data': {
-                'messages': message.__dict__
+                'chat_id': chat_id,
+                'message': MessageSerializer.full(message=message)
             }
         }
         return jsonify(response_data), 200
@@ -65,7 +67,7 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json(provide_data=True)
     def create_message(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
 
-        message_id = MessageCreator.create_message(
+        message = MessageCreator.create_message(
             browser_fingerprint=access_token.sessionId,
             chat_id=chat_id,
             text=data['message']['body'],
@@ -74,9 +76,8 @@ class MessageController(MessageControllerInterface):
         response_data = {
             'Status': 'Created',
             'data': {
-                'message': {
-                    'id': message_id
-                }
+                'chat_id': chat_id,
+                'message_id': MessageSerializer.to_id(message=message) 
             }
         }
         return jsonify(response_data), 201
@@ -94,7 +95,7 @@ class MessageController(MessageControllerInterface):
             data: dict
         ) -> tuple[Response, int]:
 
-        message_id = MessageUpdater.update_body(
+        message = MessageUpdater.update_body(
             browser_fingerprint=access_token.sessionId,
             chat_id=chat_id,
             message_id=message_id,
@@ -103,9 +104,8 @@ class MessageController(MessageControllerInterface):
         response_data = {
             'Status': 'Updated',
             'data': {
-                'message': {
-                    'id': message_id
-                }
+                'chat_id': chat_id,
+                'message_id': MessageSerializer.to_id(message=message)
             }
         }
         return jsonify(response_data), 200
@@ -118,7 +118,7 @@ class MessageController(MessageControllerInterface):
     @json_encryptor.encrypt_json()
     def delete_message(access_token: Token, chat_id: int, message_id: int) -> tuple[Response, int]:
 
-        message_id = MessageDeleter.delete_message(
+        message = MessageDeleter.delete_message(
             browser_fingerprint=access_token.sessionId,
             chat_id=chat_id, 
             message_id=message_id
@@ -126,9 +126,8 @@ class MessageController(MessageControllerInterface):
         response_data = {
             'Status': 'Deleted',
             'data': {
-                'message': {
-                    'id': message_id
-                }
+                'chat_id': chat_id,
+                'message_id': MessageSerializer.to_id(message=message)
             }
         }
         return jsonify(response_data), 200

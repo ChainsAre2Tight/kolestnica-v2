@@ -1,7 +1,6 @@
 """Conatins user creator"""
 
 
-from libraries.utils.my_dataclasses import CurrentUser
 from libraries.utils.exc import DuplicateLoginException, DuplicateUsernameException, UserNotFound
 from libraries.database.models import User, UserLogin
 
@@ -13,7 +12,7 @@ from auth_server.helpers.queries_helpers import find_user_by_username, find_user
 class UserCreator(UserCreatorIntarface):
 
     @staticmethod
-    def create(username: str, login: str, pwdh: str) -> CurrentUser:
+    def create(username: str, login: str, pwdh: str) -> User:
 
         # verify there are no duplicates
         try:
@@ -24,9 +23,8 @@ class UserCreator(UserCreatorIntarface):
 
         user, user_login = UserCreator._construct_models(username=username, login=login, pwdh=pwdh)
         UserCreator._add_user_to_database(user=user, user_login=user_login)
-        current_user = CurrentUser.from_model(user)
 
-        return current_user
+        return user
 
 
     @staticmethod

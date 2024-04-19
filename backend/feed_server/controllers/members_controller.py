@@ -5,13 +5,14 @@ from flask import Response, jsonify
 
 from libraries.crypto import json_encryptor
 from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token
-from libraries.utils.my_dataclasses import Token, convert_dataclass_to_dict
+from libraries.utils.my_dataclasses import Token
 
 from feed_server import app
 from feed_server.controllers.interfaces import MembersControllerInterface
 from feed_server.services.members.adder import MemberAdder
 from feed_server.services.members.remover import MemberRemover
 from feed_server.services.members.lister import MemberLister
+from feed_server.services.members.serializer import MemberSerializer
 
 
 class MembersController(MembersControllerInterface):
@@ -28,11 +29,11 @@ class MembersController(MembersControllerInterface):
             browser_fingerprint=access_token.sessionId
         )
 
-        members_data = convert_dataclass_to_dict(members)
         response_data = {
             'Status': 'OK',
             'data': {
-                'chats': members_data
+                'chat_id': chat_id,
+                'members': MemberSerializer.id_name_alias(members=members)
             }
         }
         return jsonify(response_data), 200
@@ -51,11 +52,11 @@ class MembersController(MembersControllerInterface):
             browser_fingerprint=access_token.sessionId
         )
 
-        members_data = convert_dataclass_to_dict(members)
         response_data = {
-            'Status': 'OK',
+            'Status': 'Added',
             'data': {
-                'chats': members_data
+                'chat_id': chat_id,
+                'members': MemberSerializer.to_ids(members=members)
             }
         }
         return jsonify(response_data), 201
@@ -74,11 +75,11 @@ class MembersController(MembersControllerInterface):
             browser_fingerprint=access_token.sessionId
         )
 
-        members_data = convert_dataclass_to_dict(members)
         response_data = {
-            'Status': 'OK',
+            'Status': 'Deleted',
             'data': {
-                'chats': members_data
+                'chat_id': chat_id,
+                'members': MemberSerializer.to_ids(members=members)
             }
         }
         return jsonify(response_data), 200

@@ -17,7 +17,7 @@ class MessageCreator(MessageCreatorInterface):
             text: str,
             timestamp: int,
             browser_fingerprint: str
-        ) -> int:
+        ) -> Message:
 
         user_id = get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
         chat = get_chat_by_id(chat_id=chat_id)
@@ -35,7 +35,7 @@ class MessageCreator(MessageCreatorInterface):
 
         MessageCreator._notify(chat_id=chat_id, message_id=message.id)
 
-        return message.id
+        return message
 
     @staticmethod
     def _notify(chat_id: int, message_id: int) -> None:

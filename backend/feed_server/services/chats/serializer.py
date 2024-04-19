@@ -3,8 +3,10 @@
 
 from libraries.database.models import Chat
 
+from feed_server.services.chats.interfaces import ChatSerializerInterface
 
-class ChatSerializer:
+
+class ChatSerializer(ChatSerializerInterface):
 
     @staticmethod
     def full(chat: Chat) -> dict:

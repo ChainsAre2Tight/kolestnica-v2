@@ -10,6 +10,7 @@ from libraries.crypto import json_encryptor
 from auth_server import app
 from auth_server.controllers.interfaces import UserControllerInterface
 from auth_server.services.users.creator import UserCreator
+from auth_server.services.users.serializer import UserSerializer
 
 
 class UserController(UserControllerInterface):
@@ -28,7 +29,6 @@ class UserController(UserControllerInterface):
     def show_current_user(access_token: Token) -> tuple[Response, int]:
         raise NotImplementedError
 
-
     @staticmethod
     @app.route('/api/users', methods=['POST'])
     @handle_http_exceptions
@@ -43,7 +43,7 @@ class UserController(UserControllerInterface):
         response_data = {
             'Status': 'Created',
             'data': {
-                'user': user.__dict__
+                'user': UserSerializer.full(user=user)
             }
         }
         return jsonify(response_data), 201

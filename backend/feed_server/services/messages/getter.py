@@ -1,7 +1,7 @@
 """Provides an object that can read and list messages"""
 
 
-from libraries.utils.my_dataclasses import Message, convert_model_to_dataclass
+from libraries.database.models import Message
 
 from feed_server.services.messages.interfaces import MessageGetterInterface
 import feed_server.helpers.quiries_helpers as quiry
@@ -21,8 +21,7 @@ class MessageGetter(MessageGetterInterface):
         verify_message_belongs_to_chat(chat=chat, message_id=message_id)
         message = quiry.get_message_by_id(message_id=message_id)
 
-        message_data = Message.from_model(message)
-        return message_data
+        return message
 
     @staticmethod
     def list_messages(chat_id: int, browser_fingerprint: str) -> list[Message]:
@@ -31,8 +30,4 @@ class MessageGetter(MessageGetterInterface):
         chat = quiry.get_chat_by_id(chat_id=chat_id)
         verify_user_in_chat(chat=chat, user_id=user_id)
 
-        messages = convert_model_to_dataclass(
-            chat.messages,
-            Message
-        )
-        return messages
+        return chat.messages
