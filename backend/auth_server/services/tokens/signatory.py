@@ -4,6 +4,7 @@ import os
 from jwt import encode
 
 from libraries.utils.my_dataclasses import Token
+from libraries.crypto import token_encryptor
 
 from auth_server.services.tokens.interfaces import SignatoryIntarface
 
@@ -15,6 +16,7 @@ TOKEN_SIGNATURE_KEY = os.environ.get('TOKEN_SECRET_KEY')
 class Signatory(SignatoryIntarface):
 
     @staticmethod
+    @token_encryptor.encrypt_token
     def sign_token(token: Token) -> str:
         signed_token = encode(
             token.__dict__,

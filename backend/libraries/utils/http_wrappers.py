@@ -1,6 +1,7 @@
 """This module contains wrappers for Flask request handlers"""
 
 
+import os
 from functools import wraps
 from typing import Callable
 import json
@@ -8,14 +9,18 @@ import json
 import jwt
 from flask import Response, make_response, request, jsonify
 
+from libraries.crypto import token_encryptor
+
 from libraries.utils import exc
 from libraries.utils.my_dataclasses import Token
 
+
+@token_encryptor.decrypt_token(keyword='raw_token')
 def decode_token(raw_token: str) -> Token:
     return Token(**jwt.decode(
         jwt=raw_token,
         key='secret',
-        algorithms=['HS256']
+        algorithms=[os.environ.get('TOKEN_SIGNATURE_ALG')]
     ))
 
 def require_access_token(func: Callable) -> tuple[Response, int] | Callable:

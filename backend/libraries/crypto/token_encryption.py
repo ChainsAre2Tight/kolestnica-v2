@@ -4,7 +4,6 @@ import os
 from functools import wraps
 
 from libraries.utils.wrapper_checks import check_for_keyword_in_kwargs
-from libraries.utils.decorators import singleton
 
 import libraries.crypto.interfaces as interface
 import libraries.crypto.strategies as strategy
@@ -15,7 +14,7 @@ class TokenEncryptionController(interface.TokenEncryptionControllerInterface):
     def __init__(self, encryption: interface.EncryptionStrategyInterface):
         self._strategy = encryption()
         self._key = os.environ.get('TOKEN_ENCRYPTION_KEY') or None
-        print('I am a token encryption controller instance', self)
+        print('I am a token encryption controller instance', self, encryption)
 
     def encrypt_token(self, func):
         @wraps(func)
