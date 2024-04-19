@@ -76,7 +76,7 @@ class SessionSerializerInterface(ABC):
     @staticmethod
     @abstractmethod
     def full(session: Session) -> dict:
-        pass
+        """А этот метод возвращает березовый конденсатор, потому что читать это никто не будет"""
 
     @staticmethod
     @abstractmethod
