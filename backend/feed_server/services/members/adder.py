@@ -1,9 +1,8 @@
 """Provides class that adds members to chat"""
 
 
-from libraries.utils.my_dataclasses import OtherUser
+from libraries.database.models import User
 from libraries.utils.exc import NoAcccessException, RequestAlreadyFullfilled
-from libraries.database import models
 
 from feed_server import celery
 from feed_server.services.members.interfaces import MemberAdderInterface
@@ -16,7 +15,7 @@ class MemberAdder(MemberAdderInterface):
 
     @staticmethod
     @commit
-    def add_member(chat_id: int, target_id: int, broser_fingerprint: str) -> list[OtherUser]:
+    def add_member(chat_id: int, target_id: int, broser_fingerprint: str) -> list[User]:
 
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=broser_fingerprint)
         chat = quiry.get_chat_by_id(chat_id=chat_id)
@@ -33,10 +32,9 @@ class MemberAdder(MemberAdderInterface):
 
         MemberAdder._notify(user=target_user, chat_id=chat_id)
 
-        result = [OtherUser.from_model(user) for user in chat.users]
-        return result
+        return chat.users
 
     @staticmethod
-    def _notify(user: models.User, chat_id: int) -> None:
+    def _notify(user: User, chat_id: int) -> None:
         for session in user.sessions:
             celery.send_task('tasks.add_to_chat', (session.socketId, chat_id))
