@@ -61,14 +61,7 @@ class Chat(db.Model):
     image_href: Mapped[str] = mapped_column(String(500), nullable=True)
     messages: Mapped[List["Message"]] = relationship(back_populates="chat")
     users: Mapped[List[User]] = relationship(secondary=User_Chats, back_populates="chats")
-
-
-class ChatEncryption(db.Model):
-    __tablename__ = 'chatencryption'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    key: Mapped[str] = mapped_column(String(128))
-    chat_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+    encryption_key: Mapped[str] = mapped_column(String(128))
 
 
 class Message(db.Model):
