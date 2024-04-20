@@ -16,7 +16,7 @@ class SessionSerializer(SessionSerializerInterface):
         }
 
     @staticmethod
-    def full_list(sessions: list[Session]) -> list[Session]:
+    def full_list(sessions: list[Session]) -> list[dict]:
         return [
             SessionSerializer.full(session=session)
             for session in sessions
