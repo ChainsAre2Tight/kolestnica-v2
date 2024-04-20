@@ -30,4 +30,5 @@ class MessageGetter(MessageGetterInterface):
         chat = quiry.get_chat_by_id(chat_id=chat_id)
         verify_user_in_chat(chat=chat, user_id=user_id)
 
-        return chat.messages
+        messages = quires.get_messages_by_chat_id(chat_id=chat.id)
+        return messages

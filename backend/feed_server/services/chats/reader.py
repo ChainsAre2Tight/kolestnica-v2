@@ -14,10 +14,11 @@ class ChatReader(ChatReaderInterface):
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
         chat = quiry.get_chat_by_id(chat_id=chat_id)
         verify_user_in_chat(chat, user_id)
-        return Chat
+        return chat
 
     @staticmethod
     def get_chats(browser_fingerprint: str) -> list[Chat]:
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
         user = quiry.get_user_by_id(user_id=user_id)
+        raise NotImplementedError('Chat reader . get chats wont load chats from user.chats due to lazy loading')
         return user.chats

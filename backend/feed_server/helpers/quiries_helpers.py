@@ -42,3 +42,11 @@ def get_message_by_id(message_id: int) -> Message:
     except NoResultFound:
         raise MessageNotFound(f'Message with id {message_id} does not exist')
     return message
+
+def get_messages_by_chat_id(chat_id: int) -> list[Message]:
+    messages = db.session.query(Message).filter(Message.chat_id == chat_id).all()
+    return messages
+
+def get_chat_members_by_chat_id(chat_id: int) -> list[User]:
+    members = db.session.query(Chat).filter(Chat.id == chat_id).users.all()
+    return members
