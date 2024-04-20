@@ -74,7 +74,7 @@ class TestRegistartion(TestCase):
         session = SessionData('test_3')
         _, code, refresh = actions.login_user(user=user, session=session)
         self.assertEqual(code, 201)
-        time.sleep(1)
+        time.sleep(2)
         # session.access_token = json['data']['tokens']['access']['value']
         json, code, new_refresh = actions.refresh_tokens(refresh_token=refresh)
         self.assertEqual(code, 200)

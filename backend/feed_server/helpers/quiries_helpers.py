@@ -2,6 +2,7 @@
 
 
 from sqlalchemy.exc import NoResultFound
+# from sqlalchemy.orm import contains_eager
 
 from libraries.utils.exc import UserNotExistsException, UserNotFoundException, ChatNotFound, MessageNotFound
 from libraries.cache import cache_controller
@@ -28,7 +29,9 @@ def get_user_by_id(user_id: int) -> User:
 
 def get_chat_by_id(chat_id: int) -> Chat:
     try:
-        chat = db.session.query(Chat).filter(Chat.id == chat_id).one()
+        query = db.session.query(Chat)\
+            .filter(Chat.id == chat_id)
+        chat = query.one()
     except NoResultFound:
         raise ChatNotFound(f'Chat with id {chat_id} does not exist')
     return chat

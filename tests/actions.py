@@ -1,11 +1,12 @@
-import requests
-from requests.cookies import RequestsCookieJar
-import hashlib
 
+import hashlib
 from json.decoder import JSONDecodeError
 
+import requests
+from requests.cookies import RequestsCookieJar
+
 from __init__ import host
-from shared import UserData, SessionData
+from shared import UserData, SessionData, ChatData
 
 
 def register_user(user: UserData) -> tuple[dict, int]:
@@ -59,6 +60,45 @@ def logout(access: str) -> tuple[dict, int]:
         url=f'http://{host}/api/users/current/sessions/current',
         timeout=5,
         headers={'Authorization': access}
+    )
+    try:
+        j = r.json()
+    except JSONDecodeError:
+        print(r.text)
+    return j, r.status_code
+
+
+def create_chat(chat: ChatData, session: SessionData) -> tuple[dict, int]:
+    r = requests.post(
+        timeout=5,
+        url=f'http://{host}/api/chats/',
+        json={'name': chat.name},
+        headers={'Authorization': session.access_token}
+    )
+    try:
+        j = r.json()
+    except JSONDecodeError:
+        print(r.text)
+    return j, r.status_code
+
+def get_chat_data(chat: ChatData, session: SessionData) -> tuple[dict, int]:
+    r = requests.get(
+        timeout=5,
+        url=f'http://{host}/api/chats/{chat.id}',
+        headers={'Authorization': session.access_token},
+    )
+    try:
+        j = r.json()
+    except JSONDecodeError:
+        print(r.text)
+    return j, r.status_code
+
+def add_user_to_chat(chat_id: int, target_id: int, session: SessionData) -> tuple[dict, int]:
+    r = requests.post(
+        timeout=5,
+        url=f'http://{host}/api/chats/{chat_id}/members/',
+        headers={'Authorization': session.access_token},
+        json={'user_id': target_id},
     )
     try:
         j = r.json()

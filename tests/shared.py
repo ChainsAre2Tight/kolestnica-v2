@@ -18,8 +18,17 @@ class UserData:
     password: str
     username: str
     sessions: list[SessionData]
+    id: int
 
     def __init__(self, login: str, password: str, username: str) -> None:
         self.login = login
         self.password = password
         self.username = username
+
+
+class ChatData:
+    name: str
+    id: int
+
+    def __init__(self, name: str) -> None:
+        self.name = name

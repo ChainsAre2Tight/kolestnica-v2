@@ -18,7 +18,7 @@ from feed_server.services.members.serializer import MemberSerializer
 class MembersController(MembersControllerInterface):
 
     @staticmethod
-    @app.route('/api/chats/<int:chat_id>/members', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/members/', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -40,7 +40,7 @@ class MembersController(MembersControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/chats/<int:chat_id>/members', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/members/', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
