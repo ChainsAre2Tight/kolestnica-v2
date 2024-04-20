@@ -19,7 +19,7 @@ from feed_server.services.messages.serializer import MessageSerializer
 class MessageController(MessageControllerInterface):
 
     @staticmethod
-    @app.route('/api/chats/<int:chat_id>/messages', methods=['GET'])
+    @app.route('/api/chats/<int:chat_id>/messages/', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -61,7 +61,7 @@ class MessageController(MessageControllerInterface):
 
 
     @staticmethod
-    @app.route('/api/chats/<int:chat_id>/messages', methods=['POST'])
+    @app.route('/api/chats/<int:chat_id>/messages/', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
