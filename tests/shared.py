@@ -12,7 +12,6 @@ class SessionData:
         self.access_token = None
 
 
-
 class UserData:
     login: str
     password: str
@@ -32,3 +31,14 @@ class ChatData:
 
     def __init__(self, name: str) -> None:
         self.name = name
+
+
+class MessageData:
+    body: str
+    id: int
+    timestamp: int
+    author_id: int
+
+    def __init__(self, body: str, timestamp: int) -> None:
+        self.body = body
+        self.timestamp = timestamp
