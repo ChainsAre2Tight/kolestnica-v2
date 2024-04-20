@@ -80,5 +80,5 @@ class SessionSerializerInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def full_list(sessions: list[Session]) -> list[Session]:
+    def full_list(sessions: list[Session]) -> list[dict]:
         pass
