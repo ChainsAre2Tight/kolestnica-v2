@@ -9,7 +9,7 @@ import actions
 
 
 class TestChatCreation(TestCase):
-    
+
     def test_chat_creation(self):
         user = UserData(
             'testchat1',
@@ -34,8 +34,6 @@ class TestChatCreation(TestCase):
                         'id': mock.ANY,
                         'name': chat.name,
                         'image_href': mock.ANY,
-                        'user_ids': [user_id],
-                        'message_ids': [],
                         'encryption_key': mock.ANY
                     }
                 }
@@ -60,9 +58,7 @@ class TestChatCreation(TestCase):
         json, code = actions.create_chat(chat, session)
         self.assertEqual(code, 201)
         chat.id = json['data']['chat']['id']
-        
         json, code = actions.get_chat_data(chat, session)
-        
         self.assertDictEqual(
             json,
             {
@@ -72,8 +68,6 @@ class TestChatCreation(TestCase):
                         'id': chat.id,
                         'name': chat.name,
                         'image_href': mock.ANY,
-                        'user_ids': [user.id],
-                        'message_ids': [],
                         'encryption_key': mock.ANY
                     }
                 }
