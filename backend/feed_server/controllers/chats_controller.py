@@ -17,7 +17,7 @@ from feed_server.services.chats.serializer import ChatSerializer
 class ChatController(ChatControllerIntarface):
 
     @staticmethod
-    @app.route('/api/chats', methods=['GET'])
+    @app.route('/api/chats/', methods=['GET'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json()
@@ -52,7 +52,7 @@ class ChatController(ChatControllerIntarface):
 
 
     @staticmethod
-    @app.route('/api/chats', methods=['POST'])
+    @app.route('/api/chats/', methods=['POST'])
     @require_access_token
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
