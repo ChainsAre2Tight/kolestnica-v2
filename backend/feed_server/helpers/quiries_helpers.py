@@ -48,5 +48,5 @@ def get_messages_by_chat_id(chat_id: int) -> list[Message]:
     return messages
 
 def get_chat_members_by_chat_id(chat_id: int) -> list[User]:
-    members = db.session.query(Chat).filter(Chat.id == chat_id).users.all()
+    members = db.session.query(User).filter(User.chats.any(Chat.id == chat_id)).all()
     return members
