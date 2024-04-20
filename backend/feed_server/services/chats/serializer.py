@@ -14,8 +14,6 @@ class ChatSerializer(ChatSerializerInterface):
             'id': chat.id,
             'name': chat.name,
             'image_href': chat.image_href,
-            'message_ids': [msg.id for msg in chat.messages],
-            'user_ids': [user.id for user in chat.users],
             'encryption_key': chat.encryption_key,
         }
 
