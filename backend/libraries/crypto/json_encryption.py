@@ -1,5 +1,6 @@
 """This module contains controller that oversees JSON encryption"""
 
+
 import os
 import json
 from functools import wraps
@@ -20,7 +21,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
             encryption_strategy: strategy.EncryptionStrategyInterface,
             decryption_key: str | int,
         ) -> None:
-        self._encryption_strategy = encryption_strategy
+        self._encryption_strategy = encryption_strategy()
         self._decryption_key = decryption_key
 
     @staticmethod
@@ -88,6 +89,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
             encryption_key: None | int | str | tuple[int, int]
         ) -> dict | list:
 
+        print(self._encryption_strategy)
         if isinstance(self._encryption_strategy, strategy.IdleEncryptionStrategy):
             return dictionary
 
