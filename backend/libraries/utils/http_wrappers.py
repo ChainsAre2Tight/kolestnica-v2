@@ -127,3 +127,27 @@ def handle_http_exceptions(func: Callable) -> Callable | tuple[Response, int]:
         except exc.BadEncryptionKeys as e:
             return make_err_response('Missing encryption keys', e), 401
     return decorated_function
+
+
+def require_api_key(func):
+    api_key = os.environ.get('API_KEY')
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        try:
+            key = dict(request.headers)['Authorization']
+
+            if key != api_key:
+                return jsonify({
+                    'Status': 'Error',
+                    'details': 'Wrong API key'
+                }), 403
+        except KeyError:
+            return jsonify({
+                    'Ststus': 'Error',
+                    'details': 'API key is missing'
+                }), 401
+
+        data = request.get_json()
+        return func(data, *args, **kwargs)
+    return decorated_function

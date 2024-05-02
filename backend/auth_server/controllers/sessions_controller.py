@@ -5,7 +5,8 @@ from flask import make_response, Response, jsonify
 
 from libraries.utils import exc
 from libraries.utils.my_dataclasses import Token
-from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token
+from libraries.utils.http_wrappers import handle_http_exceptions, require_access_token,\
+    require_api_key
 from libraries.crypto import json_encryptor
 
 from auth_server import app
@@ -16,7 +17,6 @@ from auth_server.services.sessions.updator import SessionUpdator
 from auth_server.services.tokens.creator import TokenPairCreator
 from auth_server.services.users.reader import UserReader
 from auth_server.helpers.request_helpers import provide_access_token, provide_refresh_token
-from auth_server.helpers.decorators import require_api_key
 from auth_server.services.users.serializer import UserSerializer
 
 
