@@ -4,3 +4,6 @@ flask_socketio
 pyjwt
 gunicorn==22.0.0
 eventlet
+redis
+typing_extensions
+requests

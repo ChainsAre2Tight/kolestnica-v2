@@ -1,6 +1,8 @@
 """Provides chat creator class"""
 
 
+import random
+
 from libraries.database import models
 
 from feed_server import db, celery
@@ -8,17 +10,20 @@ from feed_server.services.chats.interfaces import ChatCreatorInterface
 import feed_server.helpers.quiries_helpers as quiry
 
 
+SYMBOLS = '0123456789abcdef'
+
+
 class ChatCreator(ChatCreatorInterface):
 
     @classmethod
-    def create(cls, chat_name: str, browser_fingerprint: str) -> models.Chat:
+    def create(cls, chat_name: str, chat_image_href: str, browser_fingerprint: str) -> models.Chat:
 
         # get data
         user_id = quiry.get_user_id_by_browser_fingerprint(browser_fingerprint=browser_fingerprint)
         user = quiry.get_user_by_id(user_id=user_id)
 
         # create model
-        chat = cls._construct(chat_name=chat_name, user=user)
+        chat = cls._construct(chat_name=chat_name, user=user, image_href=chat_image_href)
         db.session.add(chat)
         db.session.commit()
 
@@ -29,17 +34,26 @@ class ChatCreator(ChatCreatorInterface):
 
     @staticmethod
     def _generate_key() -> str:
-        # some keygen shenanigans
-        return 'secretchatencryptionkey'
+        key = ''.join(random.choices(SYMBOLS, k=16))
+        return key
 
     @staticmethod
-    def _construct(chat_name, user: models.User) -> models.Chat:
-        chat = models.Chat(
-            name=chat_name,
-            messages=[],
-            users=[user],
-            encryption_key=ChatCreator._generate_key()
-        )
+    def _construct(chat_name, image_href, user: models.User) -> models.Chat:
+        if image_href != '':
+            chat = models.Chat(
+                name=chat_name,
+                messages=[],
+                users=[user],
+                encryption_key=ChatCreator._generate_key(),
+                image_href=image_href
+            )
+        else:
+            chat = models.Chat(
+                name=chat_name,
+                messages=[],
+                users=[user],
+                encryption_key=ChatCreator._generate_key(),
+            )
         return chat
 
     @staticmethod

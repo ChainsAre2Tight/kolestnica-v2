@@ -4,8 +4,8 @@ import sys
 sys.path.append('./application/')
 
 
-from notification_server import socket, app
+from notification_server import socket, app, celery
 
 
 if __name__ == "__main__":
-    socket.run(app, port=5030, debug=True)
+    socket.run(app, port=5030, debug=True, host='0.0.0.0')

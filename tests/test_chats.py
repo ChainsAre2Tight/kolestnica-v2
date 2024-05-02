@@ -103,7 +103,8 @@ class TestChatCreation(TestCase):
                         {
                             'id': user.id,
                             'username': user.username,
-                            'alias': user.username  # can be replaced
+                            'alias': user.username,  # can be replaced
+                            'image_href': mock.ANY,
                         }
                     ]
                 }

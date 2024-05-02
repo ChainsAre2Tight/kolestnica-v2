@@ -62,7 +62,7 @@ class JSONEncryptionController(interface.JSONEncryptionControllerInterface):
                         dictionary=encrypted_request_data,
                         decryption_key=self._decryption_key
                     )
-
+                    print(decrypted_request_data)
                     kwargs['data'] = decrypted_request_data # decrypted_request_data
 
                 # execute decorated function

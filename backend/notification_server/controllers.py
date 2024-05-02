@@ -2,7 +2,7 @@
 
 
 from flask import request
-from flask_socketio import join_room, leave_room
+from flask_socketio import join_room, leave_room, disconnect
 import jwt
 
 from libraries.utils.my_dataclasses import Token
@@ -15,17 +15,26 @@ from notification_server.api import update_sid
 class EventController:
 
     @staticmethod
-    @socket.on('connection')
-    def handle_connection(data: dict, access_token: Token):
+    @socket.on('connect')
+    def handle_connection(data):
+        raw_token = request.args.get('access_token')
+        print('!!! -->', request.sid)
         try:
-            access_token = decode_token(raw_token=data['data'])
+            access_token = decode_token(raw_token=raw_token)
+            print(access_token)
         except (jwt.DecodeError, jwt.InvalidSignatureError, KeyError):
             socket.emit('bad-token', to=request.sid)
+            disconnect(request.sid)
         except jwt.ExpiredSignatureError:
             socket.emit('expired', to=request.sid)
-        chats = update_sid(session_id=access_token.sessionId, sid=request.sid)
-        RoomController.add_user_to_rooms(sid=request.sid, rooms=chats)
-
+            disconnect(request.sid)
+        else:
+            chats = update_sid(session_id=access_token.sessionId, sid=request.sid)
+            print(chats)
+            RoomController.add_user_to_rooms(sid=request.sid, rooms=chats)
+            print('&&& server socket is', socket)
+            join_room(room='37', sid=request.sid)
+            socket.emit('add-message', to='37')
 
 class RoomController:
 
@@ -36,7 +45,8 @@ class RoomController:
     @staticmethod
     def add_user_to_rooms(sid: str, rooms: list[int]):
         for room in rooms:
-            join_room(room=room, sid=sid)
+            print(f'--> added {sid} to {room}')
+            join_room(room='37', sid=sid)
 
     @staticmethod
     def remove_user_from_rooms(sid: str, rooms: list[int]):

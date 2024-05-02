@@ -5,6 +5,8 @@ services:
   nginx:
     build: ./services/nginx
     restart: unless-stopped
+    networks:
+      - backend
     ports:
       - 1337:80
     depends_on:
@@ -15,6 +17,8 @@ services:
   auth:
     build: ./services/user
     restart: unless-stopped
+    networks:
+      - backend
     # command: gunicorn --bind 0.0.0.0:5020 manage:app # gunicorn
     command: python manage.py run -h 0.0.0.0 -p 5020 --debug # flask
     volumes:
@@ -32,8 +36,10 @@ services:
   feed:
     build: ./services/feed
     restart: unless-stopped
+    networks:
+      - backend
     # command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
-    command: python manage.py run -h 0.0.0.0 -p 5010 --debug # flask
+    command: bash -c "celery -A manage:celery worker --loglevel=info & python manage.py run -h 0.0.0.0 -p 5010 --debug" # flask
     volumes:
       - ./backend/:/usr/src/app/application
     expose:
@@ -51,6 +57,9 @@ services:
     build: ./services/notification
     # command: gunicorn --bind 0.0.0.0:5030 --worker-class eventlet -w 1 manage:app # gunicorn
     restart: unless-stopped
+    networks:
+      - backend
+    # command: bash -c "celery -A manage:celery worker --loglevel=debug & python manage.py" # flask_socketio
     command: python manage.py # flask_socketio
     volumes:
       - ./backend/:/usr/src/app/application
@@ -66,6 +75,8 @@ services:
   seeder:
     build: ./services/database-manager
     command: python manage.py verify_db
+    networks:
+      - backend
     volumes:
       - ./backend/:/usr/src/app/application
     environment:
@@ -81,6 +92,8 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
+    networks:
+      - backend
     expose:
       - 6379
     volumes:
@@ -98,6 +111,8 @@ services:
   db:
     image: mysql:8
     restart: unless-stopped
+    networks:
+      - backend
     expose:
       - 3307
     ports:
@@ -113,3 +128,7 @@ services:
       interval: 5s
     volumes:
       - ./dbdata:/var/lib/mysql/
+
+networks:
+  backend:
+    name: backend

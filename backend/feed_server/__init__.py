@@ -34,9 +34,12 @@ redis_queue_db = os.environ.get('REDIS_QUEUE_DB')
 
 redis_url = f'redis://{redis_host}:{redis_port}/{redis_queue_db}'
 celery = Celery(
-    'Feed celery',
-    broker=redis_url
+    'tasks',
+    broker=redis_url,
+    backend=redis_url
 )
 
+celery.conf.ignore_result = True
+celery.conf.worker_concurrency = 0
 
 from feed_server.controllers import chats_controller, messages_controller, members_controller

@@ -60,6 +60,7 @@ class ChatController(ChatControllerIntarface):
 
         chat = ChatCreator.create(
             chat_name=data['name'],
+            chat_image_href=data['image_href'],
             browser_fingerprint=access_token.sessionId
         )
         response_data = {

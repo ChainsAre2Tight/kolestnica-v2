@@ -19,6 +19,7 @@ class MemberSerializer(MemberSerializerInterface):
                 'id': member.id,
                 'username': member.username,
                 'alias': member.alias,
+                'image_href': member.image_href,
             }
             for member in members
         ]

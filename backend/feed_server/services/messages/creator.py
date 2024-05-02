@@ -39,4 +39,4 @@ class MessageCreator(MessageCreatorInterface):
 
     @staticmethod
     def _notify(chat_id: int, message_id: int) -> None:
-        celery.send_task('tasks.add_message', (chat_id, message_id))
+        celery.send_task('add_message', (chat_id, message_id))

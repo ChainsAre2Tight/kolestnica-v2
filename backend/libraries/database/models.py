@@ -13,6 +13,10 @@ from sqlalchemy.orm import relationship
 from libraries.database import db
 
 
+MOUSE = 'https://www.researchgate.net/profile/Cristian-Duran-Faundez/publication/29625723/figure/fig2/AS:339630110068751@1457985536736/Original-test-image-128x128-pixels.png'
+LENA = 'https://www.researchgate.net/profile/Pankaj-Parsania/publication/327073588/figure/fig1/AS:660600770269184@1534510905017/Input-test-image-Lena-128-X-128-Pixels.png'
+
+
 User_Chats = Table(
     "user_chats",
     db.Model.metadata,
@@ -27,7 +31,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(32), unique=True)
     alias: Mapped[str] = mapped_column(String(32))
-    image_href: Mapped[str] = mapped_column(String(300), default='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXaoP2F5I4FX1KWv3n_IRajRWfrKli9zESuXTqRgLoa89vsPBTPwEZEVyKstJ_GbXRUQg&usqp=CAU')
+    image_href: Mapped[str] = mapped_column(String(300), default=LENA)
     sessions: Mapped[List["Session"]] = relationship(back_populates='user')
     chats: Mapped[List["Chat"]] = relationship(secondary=User_Chats, back_populates='users')
 
@@ -58,7 +62,7 @@ class Chat(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    image_href: Mapped[str] = mapped_column(String(500), nullable=True)
+    image_href: Mapped[str] = mapped_column(String(500), nullable=True, default=MOUSE)
     messages: Mapped[List["Message"]] = relationship(back_populates="chat")
     users: Mapped[List[User]] = relationship(secondary=User_Chats, back_populates="chats")
     encryption_key: Mapped[str] = mapped_column(String(128))
