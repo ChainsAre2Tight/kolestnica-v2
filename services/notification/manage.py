@@ -4,7 +4,7 @@ import sys
 sys.path.append('./application/')
 
 
-from notification_server import socket, app, celery
+from notification_server import socket, app
 
 
 if __name__ == "__main__":

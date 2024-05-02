@@ -5,7 +5,6 @@ from flask import request
 from flask_socketio import join_room, leave_room, disconnect
 import jwt
 
-from libraries.utils.my_dataclasses import Token
 from libraries.utils.http_wrappers import decode_token
 
 from notification_server import socket
@@ -30,11 +29,8 @@ class EventController:
             disconnect(request.sid)
         else:
             chats = update_sid(session_id=access_token.sessionId, sid=request.sid)
-            print(chats)
             RoomController.add_user_to_rooms(sid=request.sid, rooms=chats)
-            print('&&& server socket is', socket)
-            join_room(room='37', sid=request.sid)
-            socket.emit('add-message', to='37')
+            socket.emit('ping', to='37')
 
 class RoomController:
 
@@ -46,9 +42,9 @@ class RoomController:
     def add_user_to_rooms(sid: str, rooms: list[int]):
         for room in rooms:
             print(f'--> added {sid} to {room}')
-            join_room(room='37', sid=sid)
+            join_room(room=str(room), sid=sid)
 
     @staticmethod
     def remove_user_from_rooms(sid: str, rooms: list[int]):
         for room in rooms:
-            leave_room(room=room, sid=sid)
+            leave_room(room=str(room), sid=sid)

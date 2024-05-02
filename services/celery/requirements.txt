@@ -1,0 +1,5 @@
+celery
+pyjwt
+redis
+typing_extensions
+requests

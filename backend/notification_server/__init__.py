@@ -21,4 +21,4 @@ socket = SocketIO(app, logger=True, engineio_logger=True, cors_allowed_origins=[
 
 
 from notification_server.controllers import EventController
-from notification_server.api import ChatRequests, MembersRequests, MessageRequests
+from notification_server.routes import ChatRequests, MembersRequests, MessageRequests

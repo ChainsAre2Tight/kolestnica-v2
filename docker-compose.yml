@@ -59,7 +59,6 @@ services:
     restart: unless-stopped
     networks:
       - backend
-    # command: bash -c "celery -A manage:celery worker --loglevel=debug & python manage.py" # flask_socketio
     command: python manage.py # flask_socketio
     volumes:
       - ./backend/:/usr/src/app/application
@@ -88,6 +87,22 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+  
+  celery-worker:
+    build: ./services/celery
+    restart: unless-stopped
+    command: celery -A manage:app worker --loglevel=info
+    networks:
+      - backend
+    volumes:
+      - ./backend/:/usr/src/app/application
+    env_file:
+      - ./services/celery/.env.dev
+    depends_on:
+      redis:
+        condition: service_healthy
+      notification:
+        condition: service_started
   
   redis:
     image: redis:latest

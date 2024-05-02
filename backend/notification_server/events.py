@@ -13,11 +13,11 @@ class ChatEvents:
 
     @staticmethod
     def update(chat_id):
-        socket.emit('update-chat', data={'chat_id': chat_id}, to=chat_id)
+        socket.emit('update-chat', data={'chat_id': chat_id}, to=str(chat_id))
 
     @staticmethod
     def delete(chat_id):
-        socket.emit('drop-chat', data={'chat_id': chat_id}, to=chat_id)
+        socket.emit('drop-chat', data={'chat_id': chat_id}, to=str(chat_id))
         RoomController.remove_room(room=chat_id)
 
 
@@ -39,16 +39,18 @@ class MessageEvents:
     @staticmethod
     def add(chat_id: int, message_id: int):
         print('youve got MALE')
-        socket.emit('add-message', data={'chat_id': chat_id, 'message_id': message_id}, to=chat_id)
+        socket.emit('add-message',
+                    data={'chat_id': chat_id, 'message_id': message_id},
+                    to=str(chat_id))
 
     @staticmethod
     def delete(chat_id: int, message_id: int):
         socket.emit('delete-message',
                     data={'chat_id': chat_id, 'message_id': message_id},
-                    to=chat_id)
+                    to=str(chat_id))
 
     @staticmethod
     def update(chat_id: int, message_id: int):
         socket.emit('update-message',
                     data={'chat_id': chat_id, 'message_id': message_id},
-                    to=chat_id)
+                    to=str(chat_id))
