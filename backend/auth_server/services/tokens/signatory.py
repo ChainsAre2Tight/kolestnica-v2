@@ -12,6 +12,10 @@ from auth_server.services.tokens.interfaces import SignatoryIntarface
 TOKEN_SIGNATURE_ALGORITHM = os.environ.get('TOKEN_SIGNATURE_ALG')
 TOKEN_SIGNATURE_KEY = os.environ.get('TOKEN_SECRET_KEY')
 
+if TOKEN_SIGNATURE_ALGORITHM == 'RS256':
+    raw_key = os.environ.get('TOKEN_SECRET_KEY').replace(r'\\n', '\n')
+    TOKEN_SIGNATURE_KEY = bytes(raw_key, 'utf-8')
+
 
 class Signatory(SignatoryIntarface):
 

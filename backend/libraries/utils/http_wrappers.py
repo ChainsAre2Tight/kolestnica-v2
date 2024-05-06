@@ -14,13 +14,20 @@ from libraries.crypto import token_encryptor
 from libraries.utils import exc
 from libraries.utils.my_dataclasses import Token
 
+ALG = os.environ.get('TOKEN_SIGNATURE_ALG')
+if ALG == 'RS256':
+    raw_key = os.environ.get('TOKEN_PUBLIC_KEY').replace(r'\\n', '\n')
+    PUBLIC_KEY = bytes(raw_key, 'utf-8')
+else:
+    PUBLIC_KEY = os.environ.get('TOKEN_PUBLIC_KEY')
+
 
 @token_encryptor.decrypt_token(keyword='raw_token')
 def decode_token(raw_token: str) -> Token:
     return Token(**jwt.decode(
         jwt=raw_token,
-        key='secret',
-        algorithms=[os.environ.get('TOKEN_SIGNATURE_ALG')]
+        key=PUBLIC_KEY,
+        algorithms=[ALG]
     ))
 
 def require_access_token(func: Callable) -> tuple[Response, int] | Callable:

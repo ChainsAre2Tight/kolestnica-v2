@@ -6,3 +6,4 @@ eventlet
 redis
 typing_extensions
 requests
+cryptography
