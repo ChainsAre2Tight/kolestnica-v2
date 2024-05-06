@@ -105,12 +105,12 @@ def get_chat_members(chat: ChatData, session: SessionData) -> tuple[dict, int]:
         print(r.text)
     return j, r.status_code
 
-def add_user_to_chat(chat_id: int, target_id: int, session: SessionData) -> tuple[dict, int]:
+def add_user_to_chat(chat_id: int, target_username: int, session: SessionData) -> tuple[dict, int]:
     r = requests.post(
         timeout=5,
         url=f'http://{host}/api/chats/{chat_id}/members/',
         headers={'Authorization': session.access_token},
-        json={'user_id': target_id},
+        json={'username': target_username},
     )
     try:
         j = r.json()

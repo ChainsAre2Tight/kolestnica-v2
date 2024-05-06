@@ -12,6 +12,7 @@ from feed_server.controllers.interfaces import ChatControllerIntarface
 from feed_server.services.chats.creator import ChatCreator
 from feed_server.services.chats.reader import ChatReader
 from feed_server.services.chats.serializer import ChatSerializer
+from feed_server.services.chats.patcher import ChatPatcher
 
 
 class ChatController(ChatControllerIntarface):
@@ -78,7 +79,19 @@ class ChatController(ChatControllerIntarface):
     @handle_http_exceptions
     @json_encryptor.encrypt_json(provide_data=True)
     def update_chat(access_token: Token, chat_id: int, data: dict) -> tuple[Response, int]:
-        raise NotImplementedError
+
+        chat = ChatPatcher.update_image(
+            browser_fingerprint=access_token.sessionId,
+            chat_id=chat_id,
+            image_href=data['image_href']
+        )
+        response_data = {
+            'Status': 'Updated',
+            'data': {
+                'chat': ChatSerializer.full(chat=chat)
+            }
+        }
+        return jsonify(response_data), 200
 
 
     @staticmethod

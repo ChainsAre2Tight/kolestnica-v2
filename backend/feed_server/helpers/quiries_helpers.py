@@ -27,6 +27,13 @@ def get_user_by_id(user_id: int) -> User:
         raise UserNotFoundException(f'User with id {user_id} cannot be found')
     return user
 
+def get_user_by_username(username: str) -> User:
+    try:
+        user = db.session.query(User).filter(User.username == username).one()
+    except NoResultFound:
+        raise UserNotFoundException(f'User with username "{username}" cannot be found')
+    return user
+
 def get_chat_by_id(chat_id: int) -> Chat:
     try:
         query = db.session.query(Chat)\

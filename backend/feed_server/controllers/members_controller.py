@@ -48,7 +48,7 @@ class MembersController(MembersControllerInterface):
 
         members = MemberAdder.add_member(
             chat_id=chat_id,
-            target_id=data['user_id'],
+            target_username=data['username'],
             browser_fingerprint=access_token.sessionId
         )
 

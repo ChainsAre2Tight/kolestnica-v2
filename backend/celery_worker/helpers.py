@@ -27,7 +27,7 @@ def send_request(
 
     options = {
         'url': f'{HOST}{path}',
-        'headers': {'Authorization': api_key},
+        'headers': {'Authorization': api_key, 'Content-Type': 'application/json'},
         'timeout': 10
     }
     if json:

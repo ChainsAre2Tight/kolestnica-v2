@@ -15,6 +15,8 @@ from libraries.database import db
 
 MOUSE = 'https://www.researchgate.net/profile/Cristian-Duran-Faundez/publication/29625723/figure/fig2/AS:339630110068751@1457985536736/Original-test-image-128x128-pixels.png'
 LENA = 'https://www.researchgate.net/profile/Pankaj-Parsania/publication/327073588/figure/fig1/AS:660600770269184@1534510905017/Input-test-image-Lena-128-X-128-Pixels.png'
+MAILBOX = 'https://cdn.vectorstock.com/i/preview-1x/87/41/mailbox-dark-mode-glyph-ui-icon-vector-45098741.jpg'
+USER = 'https://cdn-icons-png.flaticon.com/512/17/17004.png'
 
 
 User_Chats = Table(
@@ -31,7 +33,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(32), unique=True)
     alias: Mapped[str] = mapped_column(String(32))
-    image_href: Mapped[str] = mapped_column(String(300), default=LENA)
+    image_href: Mapped[str] = mapped_column(String(300), default=USER)
     sessions: Mapped[List["Session"]] = relationship(back_populates='user')
     chats: Mapped[List["Chat"]] = relationship(secondary=User_Chats, back_populates='users')
 
@@ -62,7 +64,7 @@ class Chat(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
-    image_href: Mapped[str] = mapped_column(String(500), nullable=True, default=MOUSE)
+    image_href: Mapped[str] = mapped_column(String(500), nullable=True, default=MAILBOX)
     messages: Mapped[List["Message"]] = relationship(back_populates="chat")
     users: Mapped[List[User]] = relationship(secondary=User_Chats, back_populates="chats")
     encryption_key: Mapped[str] = mapped_column(String(128))

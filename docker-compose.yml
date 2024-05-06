@@ -39,7 +39,8 @@ services:
     networks:
       - backend
     # command: gunicorn --bind 0.0.0.0:5010 manage:app # gunicorn
-    command: bash -c "celery -A manage:celery worker --loglevel=info & python manage.py run -h 0.0.0.0 -p 5010 --debug" # flask
+    # command: bash -c "celery -A manage:celery worker --loglevel=info & python manage.py run -h 0.0.0.0 -p 5010 --debug" # flask
+    command: python manage.py run -h 0.0.0.0 -p 5010 --debug # flask
     volumes:
       - ./backend/:/usr/src/app/application
     expose:

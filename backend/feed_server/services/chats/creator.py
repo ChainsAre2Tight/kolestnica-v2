@@ -60,4 +60,4 @@ class ChatCreator(ChatCreatorInterface):
     def _notify(user: models.User, chat_id: int) -> None:
         for session in user.sessions:
             if session.socketId is not None:
-                celery.send_task('tasks.create_chat', (session.socketId, chat_id))
+                celery.send_task('create_chat', (session.socketId, chat_id))

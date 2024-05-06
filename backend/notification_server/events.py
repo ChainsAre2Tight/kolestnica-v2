@@ -24,6 +24,10 @@ class ChatEvents:
 class MemberEvents:
 
     @staticmethod
+    def notify_change(chat_id: int) -> None:
+        socket.emit('update-members', data={'chat_id': chat_id}, to=str(chat_id))
+
+    @staticmethod
     def add(sid: str, chat_id: int):
         RoomController.add_user_to_rooms(sid=sid, rooms=[chat_id])
         socket.emit('add-chat', data={'chat_id': chat_id}, to=sid)

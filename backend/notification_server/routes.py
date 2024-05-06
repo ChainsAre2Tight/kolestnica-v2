@@ -40,6 +40,14 @@ class ChatRequests:
 class MembersRequests:
 
     @staticmethod
+    @app.route('/notifications/chats/<int:chat_id>/members/', methods=['PATCH'])
+    @require_api_key
+    @handle_http_exceptions
+    def notify_on_change(_, chat_id: int):
+        MemberEvents.notify_change(chat_id=chat_id)
+        return '', 200
+
+    @staticmethod
     @app.route('/notifications/chats/<int:chat_id>/members/', methods=['POST'])
     @require_api_key
     @handle_http_exceptions

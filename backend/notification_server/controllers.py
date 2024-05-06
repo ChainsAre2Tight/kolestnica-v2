@@ -30,7 +30,6 @@ class EventController:
         else:
             chats = update_sid(session_id=access_token.sessionId, sid=request.sid)
             RoomController.add_user_to_rooms(sid=request.sid, rooms=chats)
-            socket.emit('ping', to='37')
 
 class RoomController:
 
@@ -42,9 +41,9 @@ class RoomController:
     def add_user_to_rooms(sid: str, rooms: list[int]):
         for room in rooms:
             print(f'--> added {sid} to {room}')
-            join_room(room=str(room), sid=sid)
+            join_room(room=str(room), sid=sid, namespace='/')
 
     @staticmethod
     def remove_user_from_rooms(sid: str, rooms: list[int]):
         for room in rooms:
-            leave_room(room=str(room), sid=sid)
+            leave_room(room=str(room), sid=sid, namespace='/')
