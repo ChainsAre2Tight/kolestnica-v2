@@ -17,7 +17,7 @@ def ping():
     return 'p0ng'
 
 # socketio
-socket = SocketIO(app, logger=True, engineio_logger=True, cors_allowed_origins=["http://localhost:3000"])
+socket = SocketIO(app, logger=True, engineio_logger=True, cors_allowed_origins=["http://localhost:1337"])
 
 
 from notification_server.controllers import EventController
