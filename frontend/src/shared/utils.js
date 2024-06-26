@@ -30,7 +30,7 @@ export function disect_string(input) {
     var newText = input.replace(/<div>(.*?)<\/div>/g, '$1\n');
 
     // Remove <br> tags
-    newText = newText.replace(/<br>/g, '');
+    newText = newText.replace(/<br>/g, '\n');
     return newText
 }
 
@@ -39,7 +39,7 @@ export function redirect_to_login() {
 }
 
 export function redirect_to_app() {
-    window.location.replace('/app')
+    window.location.replace('/')
 }
 
 export function store_access_token(content) {

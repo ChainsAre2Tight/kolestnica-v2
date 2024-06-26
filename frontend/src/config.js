@@ -1,1 +1,1 @@
-export const HOST = 'http://localhost:1337'
+export const HOST = 'https://kolestnica.ru'

@@ -11,7 +11,7 @@ from celery.exceptions import Ignore
 from celery_worker import api_key
 
 
-HOST = 'http://nginx/notifications'
+HOST = 'https://kolestnica.ru/notifications'
 
 
 class TaskFailure(Exception):
@@ -28,20 +28,24 @@ def send_request(
     options = {
         'url': f'{HOST}{path}',
         'headers': {'Authorization': api_key, 'Content-Type': 'application/json'},
-        'timeout': 10
+        'timeout': 10,
+        'verify': False,
+        'allow_redirects': False,
     }
     if json:
         options['json'] = json
 
     match header:
         case 'POST':
-            r = requests.post(**options)
+            action = requests.post
         case 'PATCH':
-            r = requests.patch(**options)
+            action = requests.patch
         case 'DELETE':
-            r = requests.delete(**options)
+            action = requests.delete
         case _:
             raise ValueError(f'Unsupported request type "{header}"')
+
+    r = action(**options)
 
     if r.status_code != success_code:
         raise TaskFailure(r.text)
