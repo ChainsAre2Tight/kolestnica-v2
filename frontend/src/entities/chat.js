@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Message from './message.js'
 import { sendMessage } from '../controllers/message_controller.js'
 import ContentEditable from 'react-contenteditable'
@@ -120,22 +120,35 @@ function SendMessageButton({ currentUser, chat, setChat, messageText, sendActive
     setSendActive(false)
   }
 
+  function handlePress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      handleClick()
+    }
+  }
+
+  function handleClick() {
+    const verified = verify_message(messageText)
+    if (verified) {
+      const body = disect_string(messageText.current)
+      sendMessage(body, currentUser, chat, setChat, chats, setChats)
+      handleSendMessage()
+    } else {
+      alert('bad message') // TODO remove
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("keydown", handlePress)
+    return () => window.removeEventListener("keydown", handlePress)
+  }, [chat])
 
   return (
     <button
-      className={'send-message-button w-8 h-8 rounded-full self-end m-1 min-w-8' + (sendActive ? ' bg-blue-600' : ' bg-red-600').toString()}
-      onClick={() => {
-        const verified = verify_message(messageText)
-        if (verified) {
-          const body = disect_string(messageText.current)
-          sendMessage(body, currentUser, chat, setChat, chats, setChats)
-          handleSendMessage()
-        } else {
-          alert('bad message') // TODO remove
-        }
-      }}
+      className={'send-message-button w-8 h-8 rounded-full self-end m-1 min-w-8' + (sendActive ? ' bg-blue-600' : ' bg-darkgray-800').toString()}
+      onClick={handleClick}
       disabled={!sendActive}
-      >
+    >
     </button>
   )
 }

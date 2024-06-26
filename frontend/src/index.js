@@ -13,7 +13,7 @@ import LoginApp from './page/login.js';
 
 const router = createBrowserRouter([
   {
-    path: "/app/",
+    path: "/",
     element: <MainApp />,
   }, {
     path: '/register/',

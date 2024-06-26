@@ -16,15 +16,28 @@ export default function MainApp() {
   const [currentUser, setCurrentUser] = useState(current_user)
   const [chats, setChats] = useState([])
   const [chat, setChat] = useState('none')
+  const [loaded, setLoaded] = useState(false)
 
-  window.onload = async () => {
-    await validate_session()
-    await getChats(setChats)
-    await getCurrentUser(setCurrentUser)
-    await socket.connect()
+  let connection_attempts = 3
+
+  async function handleLoad() {
+      if (loaded) {return}
+      await validate_session()
+      await getChats(setChats)
+      await getCurrentUser(setCurrentUser)
+      await socket.connect(':443')
+      setLoaded(true)
+    }
+
+  if (document.readyState !== 'complete' && !loaded) {
+    window.addEventListener('load', handleLoad)
+  } else {
+    handleLoad()
   }
 
+
   useEffect(() => {
+
     function addMessage(data) {
       console.log(`New message in chat ${data.chat_id}/${data.message_id} `)
       recieveMessage(data.chat_id, data.message_id, chat, chats, setChat, setChats)
@@ -32,8 +45,13 @@ export default function MainApp() {
     }
 
     async function onDisconnect() {
-      await validate_session()
-      setTimeout(() => socket.connect(), 1000)
+      if (connection_attempts > 0) {
+        connection_attempts -= 1
+        await validate_session()
+        await socket.connect(':443')
+      } else {
+        console.log('Ran out of WS connection attempts')
+      }
     }
 
     function onChangeChatMembers(data) {
@@ -122,8 +140,8 @@ function ChatBar({ currentUser, chat, setChat, chats, setChats }) {
 function NoChatSelected() {
   return (
     <div className='w-full h-full backdrop-blur-2xl flex flex-col items-center justify-center'>
-      <div className='bg-red-400 p-20 rounded-2xl'>
-        aboba123
+      <div className='bg-darkgray-800 p-10 text-white text-2xl rounded-2xl text-center'>
+        No chat is selected. Create a new chat or ask other users to add you to an existing one
       </div>
     </div>
   )
